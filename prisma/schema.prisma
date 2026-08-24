@@ -64,6 +64,7 @@ model User {
   bankAccounts      BankAccount[]
   wallet            Wallet?
   carts             Cart[]
+  wishlist          Wishlist?
   orders            Order[]
   reviews           Review[]
   stockAlerts       StockAlert[]
@@ -378,6 +379,7 @@ model Product {
   accessories  AccessoryLink[]  @relation("MainProduct")
   accessoryFor AccessoryLink[]  @relation("AccessoryProduct")
   exchangeModels ExchangeDevice[]
+  wishlistItems  WishlistItem[]
 
   @@index([brandId])
   @@index([categoryId])
@@ -702,6 +704,32 @@ model CartItem {
 
   @@unique([cartId, variantId, protectionPlanId])
   @@index([cartId])
+}
+
+// ─────────────────────────── WISHLIST ───────────────────────────────────
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items WishlistItem[]
+
+  @@index([userId])
+}
+
+model WishlistItem {
+  id         String   @id @default(cuid())
+  wishlistId String
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  addedAt    DateTime @default(now())
+
+  @@unique([wishlistId, productId])
+  @@index([wishlistId])
 }
 
 // ─────────────────────────── ORDERS ────────────────────────────────────

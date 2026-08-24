@@ -186,7 +186,7 @@ function OrderCard({ order }: { order: OrderRow }) {
   const firstItem = order.items[0];
   const extraItems = order.items.length - 1;
   const totalUnits = order.items.reduce((n, i) => n + i.quantity, 0);
-  const gstNumber = order.gstNumber || '19AAAAA0000A1Z5'; // fallback GSTIN; replace with real value from DB
+  const gstNumber = '19AAAAA0000A1Z5'; // fallback GSTIN; replace with real value from DB
 
   return (
     <Panel>

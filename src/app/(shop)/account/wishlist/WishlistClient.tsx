@@ -29,6 +29,11 @@ interface WishlistProduct {
   addedAt: string;
 }
 
+const HeartIcon = () => <Heart className="size-6" />;
+const TrashIcon = () => <Trash2 className="size-4" />;
+const CartIcon = () => <ShoppingCart className="size-4" />;
+const LoaderIcon = () => <Loader2 className="size-4 animate-spin" />;
+
 export function WishlistClient() {
   const { items, removeItem, syncWithServer, hasHydrated } = useWishlist();
   const [products, setProducts] = useState<WishlistProduct[]>([]);
@@ -105,14 +110,14 @@ export function WishlistClient() {
         <Panel>
           <PanelHeader
             title="My Wishlist"
-            subtitle="Save your favorite products and never miss a deal"
+            description="Save your favorite products and never miss a deal"
           />
           <PanelBody>
             <EmptyState
-              icon={Heart}
+              icon={<HeartIcon />}
               title="Your wishlist is empty"
               description="Browse products and click the heart icon to save items you love"
-              cta={{ label: 'Browse products', href: '/products' }}
+              action={<Link href="/products" className="inline-flex items-center justify-center rounded-lg bg-volt-400 px-4 py-2 text-sm font-medium text-white hover:bg-volt-300">Browse products</Link>}
             />
           </PanelBody>
         </Panel>
@@ -125,7 +130,7 @@ export function WishlistClient() {
       <Panel>
         <PanelHeader
           title={`My Wishlist (${products.length})`}
-          subtitle="Your saved products and price drop alerts"
+          description="Your saved products and price drop alerts"
         />
         <PanelBody>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -140,7 +145,7 @@ export function WishlistClient() {
                   className="absolute top-2 right-2 z-10 rounded-full bg-void/80 p-1.5 text-ink-3 opacity-0 transition-all hover:bg-bad-400/20 hover:text-bad-400 group-hover:opacity-100"
                   aria-label="Remove from wishlist"
                 >
-                  <Trash2 className="size-4" />
+<TrashIcon />
                 </button>
 
                 <Link href={`/products/${item.product.slug}`} className="block">
@@ -165,7 +170,7 @@ export function WishlistClient() {
 
                     {!item.product.inStock && (
                       <div className="absolute inset-0 flex items-center justify-center bg-void/80">
-                        <Badge tone="red" size="sm">
+                        <Badge tone="rose" size="sm">
                           Out of stock
                         </Badge>
                       </div>
@@ -218,10 +223,10 @@ export function WishlistClient() {
                   size="sm"
                 >
                   {addingToCart === item.productId ? (
-                    <Loader2 className="size-4 animate-spin" />
+<LoaderIcon />
                   ) : (
                     <>
-                      <ShoppingCart className="size-4" />
+<CartIcon />
                       {item.product.inStock ? 'Add to Cart' : 'Out of Stock'}
                     </>
                   )}

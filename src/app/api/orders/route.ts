@@ -198,10 +198,10 @@ export const POST = route(async (req: Request) => {
     await db.inventoryStock.updateMany({
       where: {
         variantId: item.variantId,
-        available: { gte: item.quantity },
+        quantity: { gte: item.quantity + 10 }, // account for reserved
       },
       data: {
-        available: { decrement: item.quantity },
+        quantity: { decrement: item.quantity },
         reserved: { increment: item.quantity },
       },
     });

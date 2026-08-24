@@ -132,7 +132,7 @@ export function CheckoutClient({ cart, user, addresses }: CheckoutClientProps) {
                           {address.isDefault && (
                             <Badge tone="violet" size="xs">Default</Badge>
                           )}
-                          <Badge tone="neutral" size="xs" className="capitalize">{address.label}</Badge>
+                          <Badge tone="slate" size="xs" className="capitalize">{address.label}</Badge>
                         </div>
                         <p className="text-sm text-ink-3">
                           {address.line1}, {address.line2 && `${address.line2}, `}

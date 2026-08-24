@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Sheet } from '@/components/ui/overlay';
-import { CheckCircle, XCircle, Mail, Phone, Google, Apple, CaretDown } from 'lucide-react';
+import { CheckCircle, XCircle, Mail, Phone, Chrome, Apple, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
 
-type OnboardingStep = 'welcome' | 'signin' | 'permissions';
+type OnboardingStep = 'welcome' | 'signin' | 'permissions' | 'completed';
 
 export function Onboarding() {
   const [step, setStep] = useState<OnboardingStep>('welcome');
@@ -27,9 +27,7 @@ export function Onboarding() {
   const completeOnboarding = () => {
     localStorage.setItem('onboardingCompleted', 'true');
     setStep('completed');
-    toast.success('Welcome to Voltage!', {
-      description: 'Your preferences and cart are saved across sessions.',
-    });
+    toast.success('Welcome to Voltage!', 'Your preferences and cart are saved across sessions.');
   };
 
   const skipOnboarding = () => {
@@ -71,9 +69,7 @@ export function Onboarding() {
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
         setNotificationGranted(true);
-        toast.success('Notifications enabled', {
-          description: 'Youll receive order updates, price-drops and cart-abandon alerts.',
-        });
+        toast.success('Notifications enabled', 'Youll receive order updates, price-drops and cart-abandon alerts.')
       } else {
         setNotificationGranted(true);
       }
@@ -85,7 +81,9 @@ export function Onboarding() {
 
   if (step === 'completed') return null;
 
-  const steps = {
+  const activeStep = step as Exclude<OnboardingStep, 'completed'>;
+
+  const steps: Record<Exclude<OnboardingStep, 'completed'>, () => React.ReactElement> = {
     welcome: () => (
       <div className="p-6">
         <h2 className="text-2xl font-bold text-ink mb-4">Welcome to Voltage</h2>
@@ -111,7 +109,7 @@ export function Onboarding() {
           <Button
             onClick={() => {
               // TODO: initiate phone OTP flow
-              toast.info('Phone OTP selected', { description: 'Enter your mobile number to receive an OTP.' });
+              toast.info('Phone OTP selected', 'Enter your mobile number to receive an OTP.')
             }}
             variant="outline"
             fullWidth
@@ -122,7 +120,7 @@ export function Onboarding() {
           <Button
             onClick={() => {
               // TODO: initiate email sign-in
-              toast.info('Email selected', { description: 'Enter your email address.' });
+              toast.info('Email selected', 'Enter your email address.')
             }}
             variant="outline"
             fullWidth
@@ -133,18 +131,18 @@ export function Onboarding() {
           <Button
             onClick={() => {
               // TODO: Google sign-in
-              toast.info('Google selected', { description: 'Sign in with Google.' });
+              toast.info('Chrome selected', 'Sign in with Chrome.')
             }}
             variant="outline"
             fullWidth
           >
-            <Google className="size-4 mr-2" />
-            Google
+            <Chrome className="size-4 mr-2" />
+            Chrome
           </Button>
           <Button
             onClick={() => {
               // TODO: Apple sign-in
-              toast.info('Apple selected', { description: 'Sign in with Apple.' });
+              toast.info('Apple selected', 'Sign in with Apple.')
             }}
             variant="outline"
             fullWidth
@@ -188,7 +186,7 @@ export function Onboarding() {
               Skip (you can enable these in settings later)
             </Button>
             <Button
-              onComplete={completeOnboarding}
+              onClick={completeOnboarding}
               variant="primary"
               fullWidth
               disabled={!locationGranted || !notificationGranted}
@@ -203,13 +201,13 @@ export function Onboarding() {
 
   return (
     <Sheet
-      open={step !== 'completed'}
+      open={step !== 'completed' as OnboardingStep}
       onClose={() => setStep('welcome')}
       title="Onboarding"
       side="left"
     >
       <div className="h-full w-full">
-        {steps[step as OnboardingStep]()}
+        {steps[activeStep]()}
       </div>
     </Sheet>
   );

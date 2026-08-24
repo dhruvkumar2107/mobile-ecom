@@ -20,7 +20,7 @@ export const POST = route(async (req: Request) => {
   const input = await body(req, AddSchema);
   const cartId = await resolveCart(user?.id ?? null);
 
-  await addToCart(cartId, input.variantId, input.quantity, input.protectionPlanId);
+  await addToCart(cartId, { variantId: input.variantId, quantity: input.quantity, protectionPlanId: input.protectionPlanId });
   const cart = await getCart(cartId, { loyaltyTier: user?.loyaltyTier ?? null });
   return ok(cart);
 });

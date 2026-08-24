@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Sustainability — VOLTAGE',
-  description: 'Learn about VOLTAGE's commitment to environmental sustainability and responsible electronics retail.',
+  description: "Learn about VOLTAGE's commitment to environmental sustainability and responsible electronics retail.",
 };
 
 export default function SustainabilityPage() {
