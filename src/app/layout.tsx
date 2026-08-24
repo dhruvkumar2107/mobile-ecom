@@ -3,16 +3,14 @@ import './globals.css';
 import { ToastProvider } from '@/components/ui/toast';
 import { getSettings } from '@/lib/services/settings';
 
-/**
- * Fonts come from the CSS token stack in globals.css rather than
- * `next/font/google`. next/font fetches the font files at build time, which
- * turns `next build` into a network-dependent step — the site renders
- * identically on the system stack, so the dependency is not worth it.
- */
-
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
   return {
+    icons: {
+      icon: '/favicon.ico',
+      shortcut: '/favicon.ico',
+      apple: '/favicon.ico',
+    },
     title: {
       default: `${s.siteTitle} — ${s.siteTagline}`,
       template: `%s · ${s.siteTitle}`,
