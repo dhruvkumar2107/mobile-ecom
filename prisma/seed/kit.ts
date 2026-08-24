@@ -1,4 +1,6 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaLibSQL } from '@prisma/adapter-libsql';
+import { createClient } from '@libsql/client';
 
 /**
  * ════════════════════════════════════════════════════════════════════════
@@ -22,7 +24,23 @@ import { PrismaClient } from '@prisma/client';
  *  lines and are cross-checked against the service implementations.
  */
 
-export const prisma = new PrismaClient();
+/**
+ * Same backend choice as src/lib/db.ts: seed whichever database the app will
+ * actually read. The Prisma CLI resolves `prisma db push` against the
+ * datasource URL and ignores driver adapters, so without this the seed would
+ * silently fill the local file while the deployed app read an empty Turso.
+ */
+function createSeedClient(): PrismaClient {
+  const tursoUrl = process.env.TURSO_DATABASE_URL;
+  if (!tursoUrl) return new PrismaClient();
+
+  const adapter = new PrismaLibSQL(
+    createClient({ url: tursoUrl, authToken: process.env.TURSO_AUTH_TOKEN }),
+  );
+  return new PrismaClient({ adapter });
+}
+
+export const prisma = createSeedClient();
 
 /** Wall-clock anchor. Everything else is expressed relative to it. */
 export const NOW = new Date();
