@@ -186,6 +186,7 @@ function OrderCard({ order }: { order: OrderRow }) {
   const firstItem = order.items[0];
   const extraItems = order.items.length - 1;
   const totalUnits = order.items.reduce((n, i) => n + i.quantity, 0);
+  const gstNumber = order.gstNumber || '19AAAAA0000A1Z5'; // fallback GSTIN; replace with real value from DB
 
   return (
     <Panel>
@@ -215,6 +216,9 @@ function OrderCard({ order }: { order: OrderRow }) {
             <p className="tabular mt-1 text-xs text-ink-4">
               {formatDate(order.placedAt)} · {totalUnits} {totalUnits === 1 ? 'item' : 'items'}
             </p>
+            <p className="mt-1 text-xs text-ink-4">
+              GSTIN: {gstNumber}
+            </p>
           </div>
 
           <div className="flex shrink-0 items-center gap-3">
@@ -222,6 +226,29 @@ function OrderCard({ order }: { order: OrderRow }) {
               <div className="tabular text-lg font-semibold text-ink">{formatINR(order.totalPaise)}</div>
               <ChevronRight className="size-4 mt-1 text-ink-4" aria-hidden />
             </div>
+            <ButtonLink
+              href={`/account/orders/${order.id}/invoice`}
+              size="icon"
+              variant="ghost"
+              className="rounded-md p-1.5 text-volt-300 hover:bg-panel-2/60 transition-colors"
+              aria-label="Download invoice"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="size-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="11" width="17" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                <line x1="3" y1="11" x2="3.01" y2="11" />
+                <line x1="17" y1="11" x2="17.01" y2="11" />
+              </svg>
+            </ButtonLink>
           </div>
         </Link>
       </PanelBody>

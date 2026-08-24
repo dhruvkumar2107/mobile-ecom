@@ -9,6 +9,7 @@ import { DeviceArt, DeviceStage } from './device-art';
 import { Panel } from '@/components/ui/panel';
 import { Badge } from '@/components/ui/badge';
 import { ButtonLink } from '@/components/ui/button';
+import { WishlistButton } from './wishlist-button';
 import type { ProductCard as ProductCardType } from '@/lib/services/catalog';
 
 export function ProductCard({
@@ -40,6 +41,10 @@ export function ProductCard({
       aria-label={`${product.name} — ${formatINR(product.finalPaise)}${product.discountPercent ? ` (${product.discountPercent}% off)` : ''}`}
     >
       <Panel flat className="relative h-full overflow-hidden transition-shadow duration-300 group-hover:shadow-lift">
+        {/* Wishlist Button */}
+        <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+          <WishlistButton productId={product.id} size="sm" />
+        </div>
         <DeviceStage gradient={product.heroGradient} glow={!compact}>
           {product.imageUrl ? (
             <img

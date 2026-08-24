@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { ToastProvider } from '@/components/ui/toast';
+import { CookieBanner } from '@/components/site/cookie-banner';
+import { Onboarding } from '@/components/onboarding/Onboarding';
 import { getSettings, DEFAULT_SETTINGS } from '@/lib/services/settings';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -38,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="dark">
       <body className="min-h-dvh antialiased">
+        <CookieBanner />
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
