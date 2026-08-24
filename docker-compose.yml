@@ -1,0 +1,78 @@
+# ════════════════════════════════════════════════════════════════════════
+# VOLTAGE — docker-compose.yml
+# ════════════════════════════════════════════════════════════════════════
+# Production stack:
+#   - app       : Next.js application (this repo)
+#   - db        : Not needed for SQLite; data persisted in /data volume
+#   - redis     : Optional — for rate-limiting, sessions, caching (enable when scaling)
+#   - nginx     : Optional — reverse proxy with SSL termination (enable for prod)
+# ════════════════════════════════════════════════════════════════════════
+
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: voltage-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/data/prod.db
+      - AUTH_SECRET=${AUTH_SECRET}
+      - PAYMENT_DRIVER=${PAYMENT_DRIVER:-mock}
+      - PAYOUT_DRIVER=${PAYOUT_DRIVER:-mock}
+      - VERIFICATION_DRIVER=${VERIFICATION_DRIVER:-mock}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
+      - RAZORPAY_WEBHOOK_SECRET=${RAZORPAY_WEBHOOK_SECRET}
+      - RAZORPAYX_ACCOUNT_NUMBER=${RAZORPAYX_ACCOUNT_NUMBER}
+      - NEXT_PUBLIC_RAZORPAY_KEY_ID=${NEXT_PUBLIC_RAZORPAY_KEY_ID}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - APPLE_CLIENT_ID=${APPLE_CLIENT_ID}
+      - APPLE_CLIENT_SECRET=${APPLE_CLIENT_SECRET}
+      - OTP_DRIVER=${OTP_DRIVER:-console}
+      - MAIL_DRIVER=${MAIL_DRIVER:-console}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+    volumes:
+      - voltage-data:/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Uncomment and configure when scaling beyond single instance
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: voltage-redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis-data:/data
+  #   command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: voltage-nginx
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - ./certs:/etc/nginx/certs:ro
+  #   depends_on:
+  #     - app
+
+volumes:
+  voltage-data:
+    driver: local
+  # redis-data:
+  #   driver: local

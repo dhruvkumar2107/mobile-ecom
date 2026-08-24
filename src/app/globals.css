@@ -1,0 +1,279 @@
+@import 'tailwindcss';
+
+/* ════════════════════════════════════════════════════════════════════
+   VOLTAGE — design tokens
+   A dark-first "instrument panel" aesthetic: near-black glass, electric
+   cyan as the single load-bearing accent, violet for finance/loyalty
+   surfaces. No binary assets anywhere — device art, brand marks and
+   product imagery are all rendered from gradients + type.
+   ════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* Base — a blue-shifted black so cyan glows read as light, not paint */
+  --color-void: #04060c;
+  --color-abyss: #070b14;
+  --color-panel: #0b111d;
+  --color-panel-2: #101828;
+  --color-line: #1b2537;
+  --color-line-2: #253248;
+
+  --color-ink: #f2f6ff;
+  --color-ink-2: #aebbd4;
+  --color-ink-3: #6b7a96;
+  --color-ink-4: #44506b;
+
+  /* Accent ramp — electric cyan */
+  --color-volt-50: #ecfeff;
+  --color-volt-100: #cffafe;
+  --color-volt-200: #a5f3fc;
+  --color-volt-300: #67e8f9;
+  --color-volt-400: #22d3ee;
+  --color-volt-500: #06b6d4;
+  --color-volt-600: #0891b2;
+  --color-volt-700: #0e7490;
+
+  /* Secondary — violet, used for wallet / loyalty / referral surfaces */
+  --color-plasma-300: #c4b5fd;
+  --color-plasma-400: #a78bfa;
+  --color-plasma-500: #8b5cf6;
+  --color-plasma-600: #7c3aed;
+
+  /* Semantic */
+  --color-good-400: #34d399;
+  --color-good-500: #10b981;
+  --color-warn-400: #fbbf24;
+  --color-warn-500: #f59e0b;
+  --color-bad-400: #fb7185;
+  --color-bad-500: #f43f5e;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --radius-panel: 1.125rem;
+  --radius-tile: 0.875rem;
+
+  --shadow-glow: 0 0 0 1px rgb(34 211 238 / 0.18), 0 8px 40px -12px rgb(34 211 238 / 0.35);
+  --shadow-panel: 0 1px 0 0 rgb(255 255 255 / 0.04) inset, 0 24px 60px -30px rgb(0 0 0 / 0.9);
+  --shadow-lift: 0 20px 50px -24px rgb(0 0 0 / 0.85);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-shimmer: shimmer 2.2s linear infinite;
+  --animate-pulse-ring: pulse-ring 2.4s var(--ease-out-expo) infinite;
+  --animate-rise: rise 0.5s var(--ease-out-expo) both;
+  --animate-marquee: marquee 42s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgb(34 211 238 / 0.45); }
+  70% { box-shadow: 0 0 0 14px rgb(34 211 238 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(34 211 238 / 0); }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ── Base layer ──────────────────────────────────────────────────── */
+
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+    scrollbar-color: var(--color-line-2) transparent;
+  }
+
+  body {
+    background-color: var(--color-void);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* Two faint radial washes + a hairline grid: gives the near-black depth
+       without shipping an image. */
+    background-image:
+      radial-gradient(70rem 40rem at 12% -10%, rgb(34 211 238 / 0.07), transparent 60%),
+      radial-gradient(60rem 36rem at 92% 4%, rgb(139 92 246 / 0.06), transparent 62%),
+      linear-gradient(rgb(255 255 255 / 0.014) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.014) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 3rem 3rem, 3rem 3rem;
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: rgb(34 211 238 / 0.28);
+    color: var(--color-volt-50);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-volt-400);
+    outline-offset: 2px;
+  }
+
+  /* Numerals in tables/prices should line up column to column. */
+  th, td, .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  input, select, textarea, button {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Kill the browser autofill wash — it destroys a dark UI. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--color-ink);
+    -webkit-box-shadow: 0 0 0 1000px var(--color-panel-2) inset;
+    caret-color: var(--color-ink);
+  }
+
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line-2);
+    border-radius: 9999px;
+    border: 3px solid var(--color-void);
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-ink-4); }
+}
+
+/* ── Component utilities ─────────────────────────────────────────── */
+
+@layer utilities {
+  /* Frosted panel — the workhorse surface for cards, sheets, tables. */
+  .panel {
+    background-color: rgb(11 17 29 / 0.72);
+    backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .panel-flat {
+    background-color: var(--color-panel);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-panel);
+  }
+
+  /* Hairline top highlight — reads as a bevel catching light. */
+  .bevel {
+    position: relative;
+  }
+  .bevel::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.16), transparent);
+    pointer-events: none;
+  }
+
+  .text-gradient {
+    background: linear-gradient(100deg, var(--color-ink) 10%, var(--color-volt-300) 55%, var(--color-plasma-300) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--color-panel-2) 0%,
+      var(--color-line-2) 40%,
+      var(--color-panel-2) 80%
+    );
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+  }
+
+  /* Horizontal rails: hide the scrollbar but keep the scroll. */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+
+  .snap-rail {
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 1rem;
+  }
+  .snap-rail > * { scroll-snap-align: start; }
+
+  /* Fades the edge of a rail so cards do not hard-clip. */
+  .fade-x {
+    mask-image: linear-gradient(90deg, transparent, black 2.5rem, black calc(100% - 2.5rem), transparent);
+  }
+
+  .grid-overlay {
+    background-image:
+      linear-gradient(rgb(255 255 255 / 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.03) 1px, transparent 1px);
+    background-size: 2rem 2rem;
+  }
+
+  .animate-rise { animation: var(--animate-rise); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-rise,
+    .shimmer,
+    .animate-marquee { animation: none !important; }
+    * { scroll-behavior: auto !important; }
+  }
+}
+
+/* Long-form CMS / policy copy. Tailwind Typography is not installed, and a
+   handful of rules covers everything the CMS editor can emit. */
+@layer components {
+  .prose-volt {
+    color: var(--color-ink-2);
+    line-height: 1.75;
+  }
+  .prose-volt > * + * { margin-top: 1rem; }
+  .prose-volt h1, .prose-volt h2, .prose-volt h3 {
+    color: var(--color-ink);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-top: 2rem;
+  }
+  .prose-volt h1 { font-size: 1.75rem; }
+  .prose-volt h2 { font-size: 1.375rem; }
+  .prose-volt h3 { font-size: 1.125rem; }
+  .prose-volt a { color: var(--color-volt-300); text-decoration: underline; text-underline-offset: 3px; }
+  .prose-volt ul, .prose-volt ol { padding-left: 1.25rem; }
+  .prose-volt ul { list-style: disc; }
+  .prose-volt ol { list-style: decimal; }
+  .prose-volt li + li { margin-top: 0.375rem; }
+  .prose-volt strong { color: var(--color-ink); font-weight: 600; }
+  .prose-volt code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background: var(--color-panel-2);
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.375rem;
+  }
+  .prose-volt hr { border-color: var(--color-line); margin: 2rem 0; }
+  .prose-volt blockquote {
+    border-left: 2px solid var(--color-volt-500);
+    padding-left: 1rem;
+    color: var(--color-ink-2);
+  }
+}
