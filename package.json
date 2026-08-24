@@ -5,14 +5,15 @@
   "description": "VOLTAGE — ultra-premium mobile & electronics commerce platform",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma migrate deploy && npm run db:seed && next build",
+    "build": "prisma generate && prisma db push --accept-data-loss --skip-generate && npm run db:seed && next build",
     "start": "next start",
     "lint": "next lint",
     "db:push": "prisma db push",
     "db:reset": "prisma db push --force-reset && npm run db:seed",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
-    "setup": "prisma generate && prisma db push && npm run db:seed"
+    "setup": "prisma generate && prisma db push && npm run db:seed",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
