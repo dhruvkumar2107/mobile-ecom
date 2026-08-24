@@ -5,7 +5,7 @@
   "description": "VOLTAGE — ultra-premium mobile & electronics commerce platform",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && prisma migrate deploy && npm run db:seed && next build",
     "start": "next start",
     "lint": "next lint",
     "db:push": "prisma db push",
