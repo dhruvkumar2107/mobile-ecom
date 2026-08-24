@@ -59,11 +59,17 @@ async function main() {
     const migrationPath = join(process.cwd(), 'prisma', 'migrations', '20260824155935_init', 'migration.sql');
     const migrationSql = readFileSync(migrationPath, 'utf-8');
     
-    // Split SQL statements (Turso executes them one by one)
-    const statements = migrationSql
+    // Split SQL statements properly
+    // Remove comments first, then split by semicolon
+    const cleanedSql = migrationSql
+      .split('\n')
+      .filter(line => !line.trim().startsWith('--'))
+      .join('\n');
+    
+    const statements = cleanedSql
       .split(';')
       .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'));
+      .filter(s => s.length > 0);
 
     console.log(`   Found ${statements.length} SQL statements`);
     console.log('');
