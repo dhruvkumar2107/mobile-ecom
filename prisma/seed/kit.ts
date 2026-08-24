@@ -31,13 +31,7 @@ import { createClient } from '@libsql/client';
  * silently fill the local file while the deployed app read an empty Turso.
  */
 function createSeedClient(): PrismaClient {
-  const tursoUrl = process.env.TURSO_DATABASE_URL;
-  if (!tursoUrl) return new PrismaClient();
-
-  const adapter = new PrismaLibSQL(
-    createClient({ url: tursoUrl, authToken: process.env.TURSO_AUTH_TOKEN }),
-  );
-  return new PrismaClient({ adapter });
+  return new PrismaClient();
 }
 
 export const prisma = createSeedClient();
