@@ -1,10 +1,15 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { ToastProvider } from '@/components/ui/toast';
-import { getSettings } from '@/lib/services/settings';
+import { getSettings, DEFAULT_SETTINGS } from '@/lib/services/settings';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const s = await getSettings();
+  let s = DEFAULT_SETTINGS;
+  try {
+    s = await getSettings();
+  } catch {
+    // DB unavailable — fall back to defaults so every page still renders
+  }
   return {
     icons: {
       icon: '/favicon.ico',

@@ -18,6 +18,8 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@libsql/client": "^0.8.1",
+    "@prisma/adapter-libsql": "^6.1.0",
     "@prisma/client": "6.1.0",
     "bcryptjs": "2.4.3",
     "clsx": "2.1.1",
