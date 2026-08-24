@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Minus, Plus, Heart, Share2, Truck, ShieldCheck, RotateCcw, Loader2 } from 'lucide-react';
+import { Minus, Plus, Heart, Share2, Truck, ShieldCheck, RotateCcw, Loader2, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatINR } from '@/lib/money';
 import { DeviceArt, DeviceStage } from '@/components/product/device-art';
@@ -10,6 +10,8 @@ import { ProductCard } from '@/components/product/card';
 import { Panel, PanelBody, PanelHeader, PanelFooter, Row, Meter, Badge, EmptyState } from '@/components/ui/panel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/toast';
+import { api } from '@/lib/client';
 import { type ProductDetail, type VariantView, type SpecGroup } from '@/lib/services/catalog';
 
 type ProductDetailClientProps = {
@@ -18,13 +20,14 @@ type ProductDetailClientProps = {
 
 export function ProductDetailClient({ initialData }: ProductDetailClientProps) {
   const router = useRouter();
+  const toast = useToast();
   const [selectedVariant, setSelectedVariant] = useState<VariantView | null>(null);
   const [color, setColor] = useState(initialData.colors[0]?.name ?? '');
   const [ram, setRam] = useState<number | null>(initialData.ramOptions[0] ?? null);
   const [storage, setStorage] = useState<number | null>(initialData.storageOptions[0] ?? null);
   const [quantity, setQuantity] = useState(1);
-  const [addedToCart, setAddedToCart] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [isBuying, setIsBuying] = useState(false);
 
   // Find matching variant when color/ram/storage changes
   const findVariant = (): VariantView | null => {
@@ -40,22 +43,64 @@ export function ProductDetailClient({ initialData }: ProductDetailClientProps) {
   const variant = findVariant();
 
   async function addToCart() {
-    if (!variant || isAdding) return;
+    if (!variant || isAdding || isBuying) return;
+    
+    if (!variant.inStock) {
+      toast.error('This variant is out of stock');
+      return;
+    }
+
+    if (quantity > variant.sellable) {
+      toast.error(`Only ${variant.sellable} units available`);
+      return;
+    }
+
     setIsAdding(true);
     try {
-      const res = await fetch('/api/cart', {
+      const res = await api('/api/cart', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ variantId: variant.id, quantity }),
+        json: { variantId: variant.id, quantity },
       });
+      
       if (res.ok) {
-        setAddedToCart(true);
-        setTimeout(() => setAddedToCart(false), 2000);
+        toast.success('Added to cart successfully!');
+        // Trigger cart count update
+        window.dispatchEvent(new Event('cartUpdated'));
+      } else {
+        toast.error(res.error || 'Failed to add to cart');
       }
-    } catch {
-      // Silently fail
+    } catch (error) {
+      toast.error('Failed to add to cart. Please try again.');
+    } finally {
+      setIsAdding(false);
     }
-    setIsAdding(false);
+  }
+
+  async function buyNow() {
+    if (!variant || isBuying || isAdding) return;
+    
+    if (!variant.inStock) {
+      toast.error('This variant is out of stock');
+      return;
+    }
+
+    setIsBuying(true);
+    try {
+      const res = await api('/api/cart', {
+        method: 'POST',
+        json: { variantId: variant.id, quantity },
+      });
+      
+      if (res.ok) {
+        router.push('/cart?checkout=true');
+      } else {
+        toast.error(res.error || 'Failed to proceed');
+      }
+    } catch (error) {
+      toast.error('Failed to proceed. Please try again.');
+    } finally {
+      setIsBuying(false);
+    }
   }
 
   return (
@@ -204,45 +249,53 @@ export function ProductDetailClient({ initialData }: ProductDetailClientProps) {
               </div>
 
               {/* Quantity & Add to Cart */}
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 border border-line rounded-lg overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="p-2 text-ink-3 hover:text-ink hover:bg-panel-2 transition-colors"
-                    aria-label="Decrease quantity"
-                  >
-                    <Minus className="size-4" />
-                  </button>
-                  <span className="px-3 tabular text-sm font-medium text-ink min-w-[3rem] text-center">{quantity}</span>
-                  <button
-                    type="button"
-                    onClick={() => setQuantity((q) => q + 1)}
-                    className="p-2 text-ink-3 hover:text-ink hover:bg-panel-2 transition-colors"
-                    aria-label="Increase quantity"
-                  >
-                    <Plus className="size-4" />
-                  </button>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 border border-line rounded-lg overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                      disabled={isAdding || isBuying}
+                      className="p-2 text-ink-3 hover:text-ink hover:bg-panel-2 transition-colors disabled:opacity-50"
+                      aria-label="Decrease quantity"
+                    >
+                      <Minus className="size-4" />
+                    </button>
+                    <span className="px-3 tabular text-sm font-medium text-ink min-w-[3rem] text-center">{quantity}</span>
+                    <button
+                      type="button"
+                      onClick={() => setQuantity((q) => Math.min(variant?.sellable ?? 5, q + 1))}
+                      disabled={isAdding || isBuying || quantity >= (variant?.sellable ?? 5)}
+                      className="p-2 text-ink-3 hover:text-ink hover:bg-panel-2 transition-colors disabled:opacity-50"
+                      aria-label="Increase quantity"
+                    >
+                      <Plus className="size-4" />
+                    </button>
+                  </div>
                 </div>
-                <Button
-                  fullWidth
-                  size="lg"
-                  onClick={addToCart}
-                  disabled={!variant || !variant.inStock || isAdding}
-                  loading={isAdding}
-                  className="flex-1"
-                >
-                  {addedToCart ? (
-                    <>
-                      <ShieldCheck className="size-4" aria-hidden />
-                      Added to cart
-                    </>
-                  ) : variant?.inStock ? (
-                    'Add to cart'
-                  ) : (
-                    'Out of stock'
-                  )}
-                </Button>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    fullWidth
+                    size="lg"
+                    variant="secondary"
+                    onClick={addToCart}
+                    disabled={!variant || !variant.inStock || isAdding || isBuying}
+                    loading={isAdding}
+                  >
+                    <ShoppingCart className="size-4" aria-hidden />
+                    Add to cart
+                  </Button>
+                  <Button
+                    fullWidth
+                    size="lg"
+                    onClick={buyNow}
+                    disabled={!variant || !variant.inStock || isAdding || isBuying}
+                    loading={isBuying}
+                  >
+                    {variant?.inStock ? 'Buy now' : 'Out of stock'}
+                  </Button>
+                </div>
               </div>
 
               {/* Trust badges */}
