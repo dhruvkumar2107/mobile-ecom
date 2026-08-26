@@ -1,0 +1,181 @@
+/*
+ * Styles that can only be expressed in CSS — pseudo-elements, scrollbar
+ * pseudo-classes and `@media` queries that inline `style` objects can't carry.
+ * Scoped to `.mobile-root` so nothing here leaks into the desktop site.
+ */
+
+/*
+ * Repaint the document itself for mobile routes, at first paint.
+ *
+ * The desktop root layout hard-codes `dark` on <html> and gives <body> a
+ * near-black colour plus two radial washes and a grid. MobileShell strips that
+ * in an effect, but effects run after hydration -- so the server HTML flashed
+ * the dark theme first, and the body's gradients kept compositing underneath
+ * every (opaque) mobile screen for no visual benefit.
+ *
+ * `:has()` lets the mobile layout's own stylesheet do it with no JS, so the very
+ * first frame is already light and the wasted paint never happens.
+ */
+html:has(.mobile-root) {
+  color-scheme: light;
+  background-color: var(--mobile-color-background);
+}
+
+html:has(.mobile-root) body {
+  background-color: var(--mobile-color-background);
+  background-image: none;
+  color: var(--mobile-color-text-primary);
+}
+
+.mobile-root {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* Kill the 300ms tap delay and the grey flash on iOS/Android. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-root *,
+.mobile-root *::before,
+.mobile-root *::after {
+  box-sizing: border-box;
+}
+
+/* Inline styles set `--mobile-placeholder` per input variant; apply it here. */
+.mobile-root input::placeholder,
+.mobile-root textarea::placeholder {
+  color: var(--mobile-placeholder, var(--mobile-color-text-tertiary));
+  opacity: 1;
+}
+
+/* Number inputs used as quantity steppers should not show native spinners. */
+.mobile-root .mobile-no-spinner::-webkit-outer-spin-button,
+.mobile-root .mobile-no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+.mobile-root .mobile-no-spinner {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Horizontal rails: momentum, snapping, and no visible scrollbar. */
+.mobile-root .mobile-hscroll {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.mobile-root .mobile-hscroll::-webkit-scrollbar {
+  display: none;
+}
+.mobile-root .mobile-hscroll > * {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+.mobile-root .mobile-no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.mobile-root .mobile-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Focus rings: visible for keyboard users, absent for touch. */
+.mobile-root :focus {
+  outline: none;
+}
+.mobile-root :focus-visible {
+  outline: 2px solid var(--mobile-color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Shared skeleton shimmer, so every loader animates off one keyframe. */
+@keyframes mobile-shimmer {
+  0% {
+    background-position: -150% 0;
+  }
+  100% {
+    background-position: 250% 0;
+  }
+}
+
+.mobile-root .mobile-skeleton {
+  background-image: linear-gradient(
+    90deg,
+    var(--mobile-color-border-light) 0%,
+    color-mix(in srgb, var(--mobile-color-border) 60%, white) 50%,
+    var(--mobile-color-border-light) 100%
+  );
+  background-size: 200% 100%;
+  animation: mobile-shimmer 1.4s ease-in-out infinite;
+}
+
+/* Heart "burst" for wishlist toggles. */
+@keyframes mobile-heart-pop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.35);
+  }
+  60% {
+    transform: scale(0.92);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.mobile-root .mobile-heart-pop {
+  animation: mobile-heart-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Safe-area helpers for sticky footers that sit above the home indicator. */
+.mobile-root .mobile-safe-bottom {
+  padding-bottom: max(var(--mobile-space-lg), env(safe-area-inset-bottom, 0px));
+}
+.mobile-root .mobile-safe-top {
+  padding-top: max(var(--mobile-space-sm), env(safe-area-inset-top, 0px));
+}
+
+/* Line clamping for product titles. */
+.mobile-root .mobile-clamp-1,
+.mobile-root .mobile-clamp-2,
+.mobile-root .mobile-clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.mobile-root .mobile-clamp-1 {
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+.mobile-root .mobile-clamp-2 {
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+.mobile-root .mobile-clamp-3 {
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+/* Respect the OS setting — animation is decoration, never the only signal. */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-root *,
+  .mobile-root *::before,
+  .mobile-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

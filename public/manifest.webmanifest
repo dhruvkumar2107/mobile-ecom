@@ -1,0 +1,23 @@
+{
+  "name": "Voltage — Mobiles & Electronics",
+  "short_name": "Voltage",
+  "description": "Premium mobiles and electronics, delivered fast.",
+  "start_url": "/mobile",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FAFAFA",
+  "theme_color": "#FAFAFA",
+  "categories": ["shopping", "lifestyle"],
+  "icons": [
+    { "src": "/icon.svg", "type": "image/svg+xml", "sizes": "any" },
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Search", "url": "/mobile/search" },
+    { "name": "Cart", "url": "/mobile/cart" },
+    { "name": "Orders", "url": "/mobile/profile" }
+  ]
+}
