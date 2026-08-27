@@ -1,23 +1,49 @@
 {
-  "name": "Voltage — Mobiles & Electronics",
-  "short_name": "Voltage",
-  "description": "Premium mobiles and electronics, delivered fast.",
-  "start_url": "/mobile",
-  "scope": "/",
+  "name": "VOLTAGE — Premium Electronics",
+  "short_name": "VOLTAGE",
+  "description": "Ultra-premium mobile & electronics commerce. GST-invoiced, warranty-tracked, same-day dispatch.",
+  "start_url": "/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#FAFAFA",
-  "theme_color": "#FAFAFA",
-  "categories": ["shopping", "lifestyle"],
+  "background_color": "#04060c",
+  "theme_color": "#04060c",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-IN",
+  "categories": ["shopping", "electronics"],
   "icons": [
-    { "src": "/icon.svg", "type": "image/svg+xml", "sizes": "any" },
-    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
-    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
-    { "src": "/icon-maskable-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ],
+  "screenshots": [],
   "shortcuts": [
-    { "name": "Search", "url": "/mobile/search" },
-    { "name": "Cart", "url": "/mobile/cart" },
-    { "name": "Orders", "url": "/mobile/profile" }
+    {
+      "name": "Shop All",
+      "url": "/products",
+      "description": "Browse all products"
+    },
+    {
+      "name": "My Orders",
+      "url": "/account/orders",
+      "description": "View your orders"
+    },
+    {
+      "name": "Cart",
+      "url": "/cart",
+      "description": "View your cart"
+    }
   ]
 }

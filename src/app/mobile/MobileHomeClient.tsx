@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, Bell, Menu, Filter } from 'lucide-react';
+import { Search, MapPin, Bell, Menu, Filter, Sparkles, Play } from 'lucide-react';
 import { mobileDesign } from '@/lib/mobile-design';
 import { BottomTabNavigation } from '@/components/mobile/BottomTabNavigation';
 import { CategoryChips, defaultCategories } from '@/components/mobile/CategoryChips';
@@ -10,6 +10,8 @@ import { BannerCarousel } from '@/components/mobile/BannerCarousel';
 import { ProductCard } from '@/components/mobile/ProductCard';
 import { ProductCardSkeleton } from '@/components/mobile/Skeleton';
 import { HapticButton } from '@/components/mobile/HapticButton';
+import { SpinWheel } from '@/components/mobile/SpinWheel';
+import { PullToRefresh } from '@/components/ui/pull-to-refresh';
 import { formatINR } from '@/lib/money';
 
 interface Product {
@@ -38,6 +40,7 @@ export default function MobileHomeClient({ initialProducts, initialBanners }: Mo
   const [cartCount, setCartCount] = useState(3);
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [showSpinWheel, setShowSpinWheel] = useState(false);
 
   const handleWishlistToggle = useCallback((id: string) => {
     setWishlist((prev) => {
@@ -510,9 +513,144 @@ export default function MobileHomeClient({ initialProducts, initialBanners }: Mo
             ))}
           </div>
         </motion.section>
+
+        {/* Spin to Win Banner */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.4 }}
+          style={{ padding: `${mobileDesign.spacing.lg}px` }}
+        >
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setShowSpinWheel(true)}
+            style={{
+              width: '100%',
+              padding: `${mobileDesign.spacing.lg}px ${mobileDesign.spacing.xl}px`,
+              background: 'linear-gradient(135deg, #059669, #047857)',
+              borderRadius: `${mobileDesign.borderRadius.lg}px`,
+              border: 'none',
+              color: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              gap: `${mobileDesign.spacing.md}px`,
+              cursor: 'pointer',
+              boxShadow: '0 8px 24px rgba(5, 150, 105, 0.3)',
+            }}
+          >
+            <div style={{
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              background: 'rgba(255,255,255,0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '24px',
+            }}>
+              🎰
+            </div>
+            <div style={{ textAlign: 'left', flex: 1 }}>
+              <p style={{ fontSize: '16px', fontWeight: 700, fontFamily: mobileDesign.typography.fontFamily, margin: 0 }}>
+                Spin to Win Rewards!
+              </p>
+              <p style={{ fontSize: '13px', opacity: 0.8, fontFamily: mobileDesign.typography.fontFamily, margin: '2px 0 0' }}>
+                Every spin wins — discounts, free shipping, loyalty points
+              </p>
+            </div>
+            <Sparkles style={{ width: 24, height: 24, opacity: 0.8 }} />
+          </motion.button>
+        </motion.section>
+
+        {/* Video Reels Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.4 }}
+          style={{ padding: `0 ${mobileDesign.spacing.lg}px ${mobileDesign.spacing.lg}px` }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: 700,
+              fontFamily: mobileDesign.typography.fontFamily,
+              color: mobileDesign.colors.textPrimary,
+              margin: 0,
+            }}>
+              Shop Reels
+            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: mobileDesign.colors.textTertiary, fontSize: '13px' }}>
+              <Play style={{ width: 14, height: 14, fill: 'currentColor' }} />
+              Watch & Shop
+            </div>
+          </div>
+          <div style={{
+            display: 'flex',
+            gap: `${mobileDesign.spacing.sm}px`,
+            overflowX: 'auto',
+            scrollbarWidth: 'none',
+            paddingBottom: `${mobileDesign.spacing.sm}px`,
+          }}>
+            {products.slice(0, 5).map((product, i) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 * i }}
+                style={{
+                  position: 'relative',
+                  width: 140,
+                  height: 200,
+                  borderRadius: `${mobileDesign.borderRadius.lg}px`,
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                  background: mobileDesign.colors.borderLight,
+                }}
+              >
+                <img
+                  src={product.image}
+                  alt=""
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.7)' }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  padding: `${mobileDesign.spacing.sm}px`,
+                  background: 'linear-gradient(transparent, rgba(0,0,0,0.8))',
+                  color: 'white',
+                }}>
+                  <p style={{ fontSize: '12px', fontWeight: 600, fontFamily: mobileDesign.typography.fontFamily, margin: 0, lineHeight: 1.2 }}>
+                    {product.name}
+                  </p>
+                  <p style={{ fontSize: '14px', fontWeight: 700, fontFamily: mobileDesign.typography.fontFamily, margin: '2px 0 0' }}>
+                    {formatINR(product.price)}
+                  </p>
+                </div>
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: 40,
+                  height: 40,
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.9)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  <Play style={{ width: 18, height: 18, color: '#111827', marginLeft: 2, fill: '#111827' }} />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
       </main>
 
       <BottomTabNavigation currentTab="home" cartCount={cartCount} />
+      <SpinWheel isOpen={showSpinWheel} onClose={() => setShowSpinWheel(false)} />
     </div>
   );
 }

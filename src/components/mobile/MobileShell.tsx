@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { mobileDesign } from '@/lib/mobile-design';
+import { AIChat } from './AIChat';
 
 /**
  * Client shell for every /mobile route.
@@ -25,6 +26,11 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
     root.classList.remove('dark');
     root.classList.add('mobile-app');
     root.style.colorScheme = 'light';
+
+    // Register service worker for PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
 
     return () => {
       if (hadDark) root.classList.add('dark');
@@ -49,8 +55,6 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
         background: mobileDesign.colors.background,
         color: mobileDesign.colors.textPrimary,
         fontFamily: mobileDesign.typography.fontFamily,
-        // Sticky footers and the tab bar sit inside the safe area themselves;
-        // this keeps overscroll from revealing the dark body behind the app.
         overscrollBehaviorY: 'none',
       }}
     >
@@ -66,6 +70,7 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
           {children}
         </motion.main>
       </AnimatePresence>
+      <AIChat />
     </div>
   );
 }
