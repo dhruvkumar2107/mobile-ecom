@@ -233,7 +233,7 @@ function ProductRail({ products }: { products: Awaited<ReturnType<typeof homepag
   return (
     <div className="snap-rail no-scrollbar fade-x -mx-4 px-4 pb-4" role="list">
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard key={product.id} product={product} compact />
       ))}
     </div>
   );

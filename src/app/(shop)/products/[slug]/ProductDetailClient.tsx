@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Minus, Plus, Heart, Share2, Truck, ShieldCheck, RotateCcw, Loader2, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -104,6 +104,11 @@ export function ProductDetailClient({ initialData }: ProductDetailClientProps) {
       setIsBuying(false);
     }
   }
+
+  const [viewerCount, setViewerCount] = useState(0);
+  useEffect(() => {
+    setViewerCount(Math.floor(Math.random() * 80) + 40);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -215,7 +220,7 @@ export function ProductDetailClient({ initialData }: ProductDetailClientProps) {
                 <h1 className="text-2xl font-semibold tracking-tight text-ink">{initialData.name}</h1>
                 {initialData.tagline && <p className="mt-1 text-lg text-ink-2">{initialData.tagline}</p>}
                 <div className="mt-2 flex items-center gap-3">
-                  <ViewerCount count={Math.floor(Math.random() * 80) + 40} />
+                  <ViewerCount count={viewerCount} />
                 </div>
               </div>
 

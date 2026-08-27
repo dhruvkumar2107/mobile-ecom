@@ -204,7 +204,7 @@ export function SearchCommand({
       out.push({
         index: out.length,
         kind: 'all',
-        href: `/shop?q=${encodeURIComponent(term)}`,
+        href: `/products?q=${encodeURIComponent(term)}`,
         label: `Search the full catalogue for “${term}”`,
         sublabel: null,
         pricePaise: null,
@@ -234,7 +234,7 @@ export function SearchCommand({
     if (!rows.length) {
       if (e.key === 'Enter' && term.length > 0) {
         e.preventDefault();
-        go(`/shop?q=${encodeURIComponent(term)}`);
+        go(`/products?q=${encodeURIComponent(term)}`);
       }
       return;
     }
@@ -320,7 +320,7 @@ export function SearchCommand({
                 Try a model number, a brand, or a spec like 12GB.
               </p>
               <Link
-                href={`/shop?q=${encodeURIComponent(term)}`}
+                href={`/products?q=${encodeURIComponent(term)}`}
                 onClick={onClose}
                 className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-volt-300 hover:text-volt-200"
               >

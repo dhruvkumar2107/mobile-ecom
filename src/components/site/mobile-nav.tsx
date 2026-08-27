@@ -207,8 +207,8 @@ export function MobileNav({
             <DrawerLink key={link.href} link={link} active={isActive(link.href)} onNavigate={onClose} />
           ))}
           <DrawerLink
-            link={{ label: 'All devices', href: '/shop', icon: Package }}
-            active={pathname === '/shop'}
+            link={{ label: 'All devices', href: '/products', icon: Package }}
+            active={pathname === '/products'}
             onNavigate={onClose}
           />
         </div>

@@ -108,7 +108,7 @@ export function SiteFooter({
               </li>
               <li>
                 <Link
-                  href="/shop"
+                  href="/products"
                   className="text-sm text-ink-2 transition-colors hover:text-ink"
                 >
                   All devices

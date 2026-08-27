@@ -17,7 +17,7 @@ export function FlashSaleCountdown({ sale, items }: FlashSaleCountdownProps) {
   useEffect(() => {
     if (!sale) return;
     const update = () => {
-      const diff = sale.endsAt.getTime() - Date.now();
+      const diff = new Date(sale.endsAt).getTime() - Date.now();
       if (diff <= 0) {
         setTimeLeft({ h: 0, m: 0, s: 0 });
         return;
@@ -54,7 +54,7 @@ export function FlashSaleCountdown({ sale, items }: FlashSaleCountdownProps) {
               <span className="text-ink-3 hidden lg:inline">Ends {new Date(sale.endsAt).toLocaleString()}</span>
             </div>
             <Link
-              href="/shop?filter=flash_sale"
+              href="/products?badge=flash_sale"
               className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-volt-300 transition-colors hover:text-volt-200"
             >
               View all deals
