@@ -19,7 +19,7 @@ interface LiveOrderTrackingProps {
 }
 
 export function LiveOrderTracking({ orderId, estimatedDelivery }: LiveOrderTrackingProps) {
-  const [steps] = useState<OrderStep[]>([
+  const [steps] = useState<OrderStep[]>(() => [
     { id: '1', label: 'Order Placed', status: 'completed', timestamp: new Date(Date.now() - 86400000 * 2).toISOString(), icon: Package },
     { id: '2', label: 'Processing', status: 'completed', timestamp: new Date(Date.now() - 86400000 * 1).toISOString(), icon: Package },
     { id: '3', label: 'Shipped', status: 'completed', timestamp: new Date(Date.now() - 3600000 * 6).toISOString(), icon: Truck },

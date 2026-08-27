@@ -55,7 +55,7 @@ type NavIcon = React.ComponentType<{ className?: string }>;
 export type NavLink = { label: string; href: string; icon: NavIcon; hint?: string };
 
 export const SHOP_NAV: readonly NavLink[] = [
-  { label: 'Phones', href: '/category/phones', icon: Smartphone },
+  { label: 'Phones', href: '/category/mobiles', icon: Smartphone },
   { label: 'Tablets', href: '/category/tablets', icon: Tablet },
   { label: 'Audio', href: '/category/audio', icon: Headphones },
   { label: 'Wearables', href: '/category/wearables', icon: Watch },

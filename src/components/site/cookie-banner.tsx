@@ -1,10 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
-import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
 
 export function CookieBanner() {
-  const hasConsent = typeof window !== 'undefined' && localStorage.getItem('cookie-consent') === 'true';
+  const [hasConsent, setHasConsent] = useState(true);
+
+  useEffect(() => {
+    const consent = localStorage.getItem('cookie-consent');
+    setHasConsent(consent === 'true');
+  }, []);
 
   if (hasConsent) return null;
 
@@ -18,18 +22,14 @@ export function CookieBanner() {
         <button
           onClick={() => {
             localStorage.setItem('cookie-consent', 'true');
-            // Re-render by forcing a re-mount
-            window.location.reload();
+            setHasConsent(true);
           }}
           className="rounded bg-volt-400 px-3 py-1.5 text-void hover:bg-volt-300 transition-colors"
         >
           Accept
         </button>
         <button
-          onClick={() => {
-            // Open preferences modal (simple alert for now)
-            alert('Manage your cookie preferences here.');
-          }}
+          onClick={() => setHasConsent(true)}
           className="rounded bg-panel-2 px-3 py-1.5 text-volt-300 hover:text-volt-400 transition-colors"
         >
           Manage

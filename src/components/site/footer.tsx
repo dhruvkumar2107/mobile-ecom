@@ -68,7 +68,7 @@ export function SiteFooter({
             <ul className="mt-3 space-y-2" role="list">
               <li>
                 <Link
-                  href="/category/phones"
+                  href="/category/mobiles"
                   className="text-sm text-ink-2 transition-colors hover:text-ink"
                 >
                   Phones

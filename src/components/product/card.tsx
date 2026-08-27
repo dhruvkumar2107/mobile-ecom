@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BadgeCheck, Tag, Truck, Star, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatINR, formatNumber } from '@/lib/money';
@@ -20,9 +20,16 @@ export function ProductCard({
 }) {
   const [hovered, setHovered] = useState(false);
 
+  const [showFlashSale, setShowFlashSale] = useState(false);
+
   const inStock = product.inStock;
   const isPreorder = product.isPreorder;
-  const showFlashSale = product.flashSale && new Date(product.flashSale.endsAt).getTime() > Date.now();
+
+  useEffect(() => {
+    if (product.flashSale) {
+      setShowFlashSale(new Date(product.flashSale.endsAt).getTime() > Date.now());
+    }
+  }, [product.flashSale]);
 
   return (
     <Link

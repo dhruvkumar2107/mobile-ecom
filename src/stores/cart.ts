@@ -67,9 +67,17 @@ export const useCartStore = create<CartStore>()(
       clearCart: () => set({ items: [] }),
       clearFlyingItem: () => set({ flyingItem: null }),
 
-      totalItems: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
-      totalPrice: () => get().items.reduce((sum, i) => sum + i.price * i.quantity, 0),
+      totalItems: () => get().items.reduce((sum, i) => sum + (i.quantity || 0), 0),
+      totalPrice: () => get().items.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 0)), 0),
     }),
-    { name: 'voltage-cart' }
+    { name: 'voltage-cart', version: 2, migrate: (persisted: any, version: number) => {
+      if (version < 2) {
+        // Clear stale cart data from old schema
+        return { items: [], flyingItem: null };
+      }
+      // Filter out items with missing/invalid price
+      const items = (persisted?.items ?? []).filter((i: any) => i && typeof i.price === 'number' && i.price > 0);
+      return { ...persisted, items, flyingItem: null };
+    }}
   )
 );

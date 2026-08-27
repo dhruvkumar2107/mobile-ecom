@@ -90,7 +90,7 @@ export default async function HomePage() {
           )}
 
           {/* Category tiles */}
-          <Link href="/products?filter=phones" className="glass-card p-5 flex flex-col justify-end relative overflow-hidden group hover:shadow-lg transition-all">
+          <Link href="/category/mobiles" className="glass-card p-5 flex flex-col justify-end relative overflow-hidden group hover:shadow-lg transition-all">
             <div className="absolute top-3 right-3 opacity-10 group-hover:opacity-20 transition-opacity" aria-hidden="true">
               <svg viewBox="0 0 80 80" fill="none" className="size-16"><rect x="20" y="0" width="40" height="80" rx="8" stroke="#22d3ee" strokeWidth="1.5" /><rect x="26" y="8" width="28" height="64" rx="4" fill="#22d3ee" fillOpacity="0.1" /></svg>
             </div>
@@ -99,7 +99,7 @@ export default async function HomePage() {
             <p className="text-xs text-ink-3 mt-0.5">From {formatINR(999900)}</p>
           </Link>
 
-          <Link href="/products?filter=audio" className="glass-card p-5 flex flex-col justify-end relative overflow-hidden group hover:shadow-lg transition-all">
+          <Link href="/category/audio" className="glass-card p-5 flex flex-col justify-end relative overflow-hidden group hover:shadow-lg transition-all">
             <div className="absolute top-3 right-3 opacity-10 group-hover:opacity-20 transition-opacity" aria-hidden="true">
               <svg viewBox="0 0 80 80" fill="none" className="size-16"><circle cx="40" cy="40" r="28" stroke="#a78bfa" strokeWidth="1.5" /><circle cx="40" cy="40" r="12" fill="#a78bfa" fillOpacity="0.1" /></svg>
             </div>
@@ -181,7 +181,7 @@ export default async function HomePage() {
             title="Launching soon"
             description="Pre-order or get notified when they drop."
             action={
-              <Link href="/products?filter=coming_soon" className="text-sm font-medium text-volt-300 transition-colors hover:text-volt-200">
+              <Link href="/products?badge=preorder" className="text-sm font-medium text-volt-300 transition-colors hover:text-volt-200">
                 View all <ChevronRight className="size-3.5 ml-1 inline" aria-hidden />
               </Link>
             }

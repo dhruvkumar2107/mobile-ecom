@@ -104,7 +104,7 @@ export function SiteHeader({
               <BrandMark size="md" className="hidden sm:inline-flex" />
             </Link>
 
-            <nav aria-label="Primary" className="ml-4 hidden min-w-0 items-center gap-0.5 lg:flex">
+            <nav aria-label="Primary" className="ml-4 hidden min-w-0 flex-1 overflow-hidden items-center gap-0.5 lg:flex">
               {navLinks.map((link) => {
                 const active = isActive(link.href);
                 return (

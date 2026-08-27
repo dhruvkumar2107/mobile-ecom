@@ -46,7 +46,7 @@ export function MiniCartBar() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-ink truncate">{item.name}</p>
-                      <p className="text-xs text-ink-3">{formatINR(item.price)}</p>
+                      <p className="text-xs text-ink-3">{formatINR(item.price ?? 0)}</p>
                     </div>
                     <div className="flex items-center gap-1">
                       <button className="size-6 rounded-md bg-panel-2 flex items-center justify-center text-ink-3 hover:text-ink transition-colors" aria-label="Decrease quantity">
