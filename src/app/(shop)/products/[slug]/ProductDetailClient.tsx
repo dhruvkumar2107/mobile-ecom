@@ -106,7 +106,9 @@ export function ProductDetailClient({ initialData }: ProductDetailClientProps) {
   }
 
   const [viewerCount, setViewerCount] = useState(0);
+  const [mounted, setMounted] = useState(false);
   useEffect(() => {
+    setMounted(true);
     setViewerCount(Math.floor(Math.random() * 80) + 40);
   }, []);
 
@@ -220,7 +222,7 @@ export function ProductDetailClient({ initialData }: ProductDetailClientProps) {
                 <h1 className="text-2xl font-semibold tracking-tight text-ink">{initialData.name}</h1>
                 {initialData.tagline && <p className="mt-1 text-lg text-ink-2">{initialData.tagline}</p>}
                 <div className="mt-2 flex items-center gap-3">
-                  <ViewerCount count={viewerCount} />
+                  {mounted && <ViewerCount count={viewerCount} />}
                 </div>
               </div>
 

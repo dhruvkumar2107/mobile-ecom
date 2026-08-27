@@ -29,6 +29,7 @@ const inrFormatterPaise = new Intl.NumberFormat('en-IN', {
 
 /** ₹1,29,900 — the storefront default. */
 export function formatINR(paise: number): string {
+  if (typeof paise !== 'number' || isNaN(paise)) return '₹0';
   return inrFormatter.format(paise / PAISE);
 }
 

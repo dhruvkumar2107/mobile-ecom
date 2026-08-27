@@ -9,7 +9,6 @@ import { useState, useEffect } from 'react';
 
 export function MiniCartBar() {
   const [hydrated, setHydrated] = useState(false);
-  const items = useCartStore((s) => s.items);
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
@@ -18,9 +17,18 @@ export function MiniCartBar() {
 
   if (!hydrated) return null;
 
-  const validItems = items.filter((i) => i && typeof i.price === 'number');
-  const totalItems = validItems.reduce((sum, i) => sum + i.quantity, 0);
-  const totalPrice = validItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  let items: any[] = [];
+  let totalItems = 0;
+  let totalPrice = 0;
+  try {
+    items = useCartStore.getState().items;
+    const validItems = Array.isArray(items) ? items.filter((i: any) => i && typeof i.price === 'number') : [];
+    totalItems = validItems.reduce((sum: number, i: any) => sum + (i.quantity || 0), 0);
+    totalPrice = validItems.reduce((sum: number, i: any) => sum + (i.price || 0) * (i.quantity || 0), 0);
+    items = validItems;
+  } catch {
+    return null;
+  }
 
   if (totalItems === 0) return null;
 
@@ -48,18 +56,16 @@ export function MiniCartBar() {
                 </button>
               </div>
               <div className="max-h-60 overflow-y-auto p-4 space-y-3">
-                {validItems.map((item) => (
+                {items.map((item: any) => (
                   <div key={item.id} className="flex items-center gap-3">
                     <div className="size-12 rounded-lg bg-panel-2 overflow-hidden shrink-0">
-                      <img src={item.image} alt={item.name} className="size-full object-contain p-1" />
+                      <img src={item.image || '/icon.svg'} alt={item.name || ''} className="size-full object-contain p-1" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-ink truncate">{item.name}</p>
                       <p className="text-xs text-ink-3">{formatINR(item.price)}</p>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <span className="w-6 text-center text-xs font-medium text-ink tabular-nums">{item.quantity}</span>
-                    </div>
+                    <span className="w-6 text-center text-xs font-medium text-ink tabular-nums">{item.quantity}</span>
                   </div>
                 ))}
               </div>
