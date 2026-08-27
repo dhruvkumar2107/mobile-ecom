@@ -353,7 +353,7 @@ export function OrderCard({
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: `${mobileDesign.spacing.sm}px` }}>
-          {items.slice(0, 3).map((item) => (
+          {items.filter(Boolean).slice(0, 3).map((item) => (
             <div
               key={item.id}
               style={{
