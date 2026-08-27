@@ -32,7 +32,7 @@ export function ProductCard({
       href={`/products/${product.slug}`}
       className={cn(
         'group',
-        compact ? 'w-56 shrink-0' : 'w-64 shrink-0 sm:w-72',
+        compact ? 'w-56 shrink-0' : 'w-full',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-volt-400 focus-visible:ring-offset-2 focus-visible:ring-offset-void'
       )}
       onMouseEnter={() => setHovered(true)}
@@ -51,6 +51,10 @@ export function ProductCard({
               src={product.imageUrl}
               alt={product.name}
               className="size-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+              onError={(e) => {
+                e.currentTarget.src = '/icon.svg';
+                e.currentTarget.onerror = null;
+              }}
             />
           ) : (
             <DeviceArt

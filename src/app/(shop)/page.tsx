@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, Cable, ChevronRight, Headphones, Package, ShieldCheck, Smartphone, Tablet, Truck, Watch, Zap } from 'lucide-react';
-import { homepageData } from '@/lib/services/catalog';
+import { unstable_cache } from 'next/cache';
+import { homepageData, type HomeData } from '@/lib/services/catalog';
 import { getCurrentUser } from '@/lib/auth';
 import { getSettings } from '@/lib/services/settings';
 import { formatINR } from '@/lib/money';
@@ -18,9 +19,17 @@ export const metadata: Metadata = {
   description: 'Ultra-premium mobile & electronics commerce. GST-invoiced, warranty-tracked, same-day dispatch.',
 };
 
+async function getCachedHomeData(loyaltyTier: string | null): Promise<HomeData> {
+  return homepageData({ loyaltyTier });
+}
+
 export default async function HomePage() {
   const user = await getCurrentUser();
-  const data = await homepageData({ loyaltyTier: user?.loyaltyTier ?? null });
+  const data = await unstable_cache(
+    () => getCachedHomeData(user?.loyaltyTier ?? null),
+    ['homepage', user?.loyaltyTier ?? 'none'],
+    { revalidate: 120, tags: ['homepage'] }
+  )();
 
   return (
     <div className="space-y-10">

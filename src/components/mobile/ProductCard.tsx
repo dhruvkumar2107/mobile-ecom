@@ -110,6 +110,7 @@ export function ProductCard({
             // Above-the-fold tiles are the LCP candidate on the home grid.
             priority={priority}
             loading={priority ? undefined : 'lazy'}
+            fallbackSrc="/icon.svg"
           />
         </motion.div>
 
@@ -409,7 +410,7 @@ export function ProductCardHorizontal({
       role={onPress ? 'button' : 'article'}
     >
       <div style={{ position: 'relative', width: '100px', flexShrink: 0, aspectRatio: '1/1' }}>
-        <MobileImage src={image} alt="" sizes="100px" />
+        <MobileImage src={image} alt="" sizes="100px" fallbackSrc="/icon.svg" />
         <motion.button
           onClick={(e) => {
             e.stopPropagation();

@@ -42,5 +42,8 @@ export const GET = route(async (req) => {
     loyaltyTier: params.loyaltyTier ?? null,
   };
   const result: ListResult = await listProducts(filter);
-  return Response.json({ ok: true, data: result });
+  const res = Response.json({ ok: true, data: result });
+  // Cache for 30 seconds, stale-while-revalidate for 5 minutes
+  res.headers.set('Cache-Control', 'public, max-age=30, stale-while-revalidate=300');
+  return res;
 });

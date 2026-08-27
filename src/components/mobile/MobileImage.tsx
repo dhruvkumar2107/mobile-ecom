@@ -5,12 +5,14 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface MobileImageProps
-  extends Omit<ImageProps, 'src' | 'alt' | 'onLoad' | 'placeholder' | 'blurDataURL'> {
+  extends Omit<ImageProps, 'src' | 'alt' | 'onLoad' | 'onError' | 'placeholder' | 'blurDataURL'> {
   src: string;
   /** Empty string is correct for decorative product art next to a visible name. */
   alt: string;
   /** Fade the image in once decoded, instead of popping. */
   fadeIn?: boolean;
+  /** Fallback image if the primary src fails to load. */
+  fallbackSrc?: string;
 }
 
 /**
@@ -27,20 +29,35 @@ export function MobileImage({
   sizes = '(max-width: 480px) 50vw, 240px',
   quality = 72,
   fadeIn = true,
+  fallbackSrc = '/icon.svg',
   className,
   style,
   ...rest
 }: MobileImageProps) {
   const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
+  const [currentSrc, setCurrentSrc] = useState(src);
+
+  const handleError = () => {
+    if (!error && fallbackSrc && currentSrc !== fallbackSrc) {
+      setError(true);
+      setCurrentSrc(fallbackSrc);
+    }
+  };
+
+  const handleLoad = () => {
+    setLoaded(true);
+  };
 
   return (
     <Image
-      src={src}
+      src={currentSrc}
       alt={alt}
       fill
       sizes={sizes}
       quality={quality}
-      onLoad={() => setLoaded(true)}
+      onLoad={handleLoad}
+      onError={handleError}
       className={cn('mobile-image', className)}
       style={{
         objectFit: 'cover',

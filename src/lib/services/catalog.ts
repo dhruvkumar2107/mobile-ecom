@@ -45,7 +45,7 @@ import {
  *     filters is an admin action, not a deploy.
  */
 
-const MAX_SCAN = 1500;
+const MAX_SCAN = 500;
 
 export const CATALOG_SORTS = [
   'featured',
@@ -1481,7 +1481,7 @@ export async function homepageData(opts: { loyaltyTier?: string | null } = {}): 
       db.product.findMany({
         where: { status: 'active' },
         include: PRODUCT_INCLUDE,
-        take: 40,
+        take: 20,
       }),
       db.product.findMany({
         where: {

@@ -175,7 +175,7 @@
       linear-gradient(rgb(255 255 255 / 0.014) 1px, transparent 1px),
       linear-gradient(90deg, rgb(255 255 255 / 0.014) 1px, transparent 1px);
     background-size: 100% 100%, 100% 100%, 3rem 3rem, 3rem 3rem;
-    background-attachment: fixed;
+    background-attachment: scroll;
   }
 
   ::selection {

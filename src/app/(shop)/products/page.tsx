@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { unstable_cache } from 'next/cache';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 import { listProducts, type ProductFilter, type ListResult } from '@/lib/services/catalog';
@@ -30,13 +31,26 @@ interface ProductsPageProps {
   }>;
 }
 
+async function getCachedData(
+  filter: ProductFilter,
+  loyaltyTier: string | null
+): Promise<{ result: ListResult; brands: Array<{ id: string; name: string; slug: string; accent: string }>; categories: Array<{ id: string; name: string; slug: string; icon: string | null }>; kinds: Array<{ id: string; name: string; slug: string }> }> {
+  const [result, brands, categories, kinds] = await Promise.all([
+    listProducts(filter),
+    db.brand.findMany({ where: { isActive: true }, orderBy: { sortOrder: 'asc' }, select: { id: true, name: true, slug: true, accent: true } }),
+    db.category.findMany({ where: { isActive: true, parentId: null }, orderBy: { sortOrder: 'asc' }, select: { id: true, name: true, slug: true, icon: true } }),
+    db.category.findMany({ where: { isActive: true, parentId: { not: null } }, orderBy: { sortOrder: 'asc' }, select: { id: true, name: true, slug: true } }),
+  ]);
+  return { result, brands, categories, kinds };
+}
+
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const params = await searchParams;
   const user = await getCurrentUser();
 
   const filter: ProductFilter = {
     page: params.page ? Math.max(1, parseInt(params.page, 10)) : 1,
-    perPage: 12,
+    perPage: 16,
     sort: (CATALOG_SORTS as readonly string[]).includes(params.sort ?? '') ? (params.sort as ProductFilter['sort']) : 'featured',
     brandSlugs: params.brand ? params.brand.split(',') : undefined,
     categorySlug: params.category,
@@ -53,27 +67,25 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     loyaltyTier: user?.loyaltyTier ?? null,
   };
 
-  let result: ListResult;
+  let data: { result: ListResult; brands: any; categories: any; kinds: any };
   try {
-    result = await listProducts(filter);
+    data = await unstable_cache(
+      () => getCachedData(filter, user?.loyaltyTier ?? null),
+      ['products', JSON.stringify(filter), user?.loyaltyTier ?? 'none'],
+      { revalidate: 60, tags: ['products'] }
+    )();
   } catch (err) {
     if (err instanceof Error && err.message === 'Category not found.') notFound();
     throw err;
   }
 
-  const [brands, categories, kinds] = await Promise.all([
-    db.brand.findMany({ where: { isActive: true }, orderBy: { sortOrder: 'asc' }, select: { id: true, name: true, slug: true, accent: true } }),
-    db.category.findMany({ where: { isActive: true, parentId: null }, orderBy: { sortOrder: 'asc' }, select: { id: true, name: true, slug: true, icon: true } }),
-    db.category.findMany({ where: { isActive: true, parentId: { not: null } }, orderBy: { sortOrder: 'asc' }, select: { id: true, name: true, slug: true } }),
-  ]);
-
   return (
     <ProductListingClient
-      initialResult={result}
+      initialResult={data.result}
       initialFilter={filter}
-      brands={brands}
-      categories={categories}
-      kinds={kinds}
+      brands={data.brands}
+      categories={data.categories}
+      kinds={data.kinds}
       sorts={CATALOG_SORTS}
       sortLabels={CATALOG_SORT_LABEL}
     />
