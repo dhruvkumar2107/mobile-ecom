@@ -12,6 +12,7 @@ import { ProductCardSkeleton } from '@/components/mobile/Skeleton';
 import { HapticButton } from '@/components/mobile/HapticButton';
 import { SpinWheel } from '@/components/mobile/SpinWheel';
 import { PullToRefresh } from '@/components/ui/pull-to-refresh';
+import { VideoFeed } from '@/components/mobile/VideoFeed';
 import { formatINR } from '@/lib/money';
 
 interface Product {
@@ -569,83 +570,7 @@ export default function MobileHomeClient({ initialProducts, initialBanners }: Mo
           transition={{ delay: 0.6, duration: 0.4 }}
           style={{ padding: `0 ${mobileDesign.spacing.lg}px ${mobileDesign.spacing.lg}px` }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-            <h2 style={{
-              fontSize: '20px',
-              fontWeight: 700,
-              fontFamily: mobileDesign.typography.fontFamily,
-              color: mobileDesign.colors.textPrimary,
-              margin: 0,
-            }}>
-              Shop Reels
-            </h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: mobileDesign.colors.textTertiary, fontSize: '13px' }}>
-              <Play style={{ width: 14, height: 14, fill: 'currentColor' }} />
-              Watch & Shop
-            </div>
-          </div>
-          <div style={{
-            display: 'flex',
-            gap: `${mobileDesign.spacing.sm}px`,
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-            paddingBottom: `${mobileDesign.spacing.sm}px`,
-          }}>
-            {products.slice(0, 5).map((product, i) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1 * i }}
-                style={{
-                  position: 'relative',
-                  width: 140,
-                  height: 200,
-                  borderRadius: `${mobileDesign.borderRadius.lg}px`,
-                  overflow: 'hidden',
-                  flexShrink: 0,
-                  background: mobileDesign.colors.borderLight,
-                }}
-              >
-                <img
-                  src={product.image}
-                  alt=""
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.7)' }}
-                />
-                <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  padding: `${mobileDesign.spacing.sm}px`,
-                  background: 'linear-gradient(transparent, rgba(0,0,0,0.8))',
-                  color: 'white',
-                }}>
-                  <p style={{ fontSize: '12px', fontWeight: 600, fontFamily: mobileDesign.typography.fontFamily, margin: 0, lineHeight: 1.2 }}>
-                    {product.name}
-                  </p>
-                  <p style={{ fontSize: '14px', fontWeight: 700, fontFamily: mobileDesign.typography.fontFamily, margin: '2px 0 0' }}>
-                    {formatINR(product.price)}
-                  </p>
-                </div>
-                <div style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: 40,
-                  height: 40,
-                  borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.9)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                  <Play style={{ width: 18, height: 18, color: '#111827', marginLeft: 2, fill: '#111827' }} />
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <VideoFeed />
         </motion.section>
       </main>
 

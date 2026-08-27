@@ -20,6 +20,7 @@ import { Button, ButtonLink } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
+import { EmptyCartIllustration } from '@/components/ui/illustrations';
 import { api } from '@/lib/client';
 
 const FREE_DELIVERY_THRESHOLD_PAISE = 4_999_900;
@@ -176,17 +177,7 @@ export function CartClient({ initialCart, initialProtectionOffers, settings, use
       <h1 className="text-2xl font-semibold tracking-tight text-ink">Your cart</h1>
 
       {cart.isEmpty ? (
-        <EmptyState
-          icon={<Gift className="size-5" />}
-          title="Your cart is empty"
-          description="Looks like you haven&apos;t added anything yet. Browse our catalogue and pick your next device."
-          action={
-            <ButtonLink href="/products" size="md">
-              <ArrowRight className="size-4 ml-2" aria-hidden />
-              Continue shopping
-            </ButtonLink>
-          }
-        />
+        <EmptyCartIllustration />
       ) : (
         <>
           {/* Cart items */}

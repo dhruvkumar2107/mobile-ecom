@@ -11,6 +11,8 @@ import { Panel, PanelBody, PanelHeader, PanelFooter, Row, Meter, Badge, EmptySta
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast';
+import { SizeRecommendation } from '@/components/ui/size-recommendation';
+import { ViewerCount, UrgencyIndicator } from '@/components/ui/social-proof';
 import { api } from '@/lib/client';
 import { type ProductDetail, type VariantView, type SpecGroup } from '@/lib/services/catalog';
 
@@ -212,6 +214,9 @@ export function ProductDetailClient({ initialData }: ProductDetailClientProps) {
                 </Badge>
                 <h1 className="text-2xl font-semibold tracking-tight text-ink">{initialData.name}</h1>
                 {initialData.tagline && <p className="mt-1 text-lg text-ink-2">{initialData.tagline}</p>}
+                <div className="mt-2 flex items-center gap-3">
+                  <ViewerCount count={Math.floor(Math.random() * 80) + 40} />
+                </div>
               </div>
 
               <div className="flex items-baseline gap-3">
@@ -229,10 +234,13 @@ export function ProductDetailClient({ initialData }: ProductDetailClientProps) {
               </div>
 
               {selectedVariant?.lowStock && (
-                <p className="flex items-center gap-1.5 text-sm text-warn-400">
-                  <Truck className="size-4" aria-hidden />
-                  Only {selectedVariant.sellable} left in stock
-                </p>
+                <div className="space-y-1">
+                  <p className="flex items-center gap-1.5 text-sm text-warn-400">
+                    <Truck className="size-4" aria-hidden />
+                    Only {selectedVariant.sellable} left in stock
+                  </p>
+                  <UrgencyIndicator stockLeft={selectedVariant.sellable} />
+                </div>
               )}
 
               {selectedVariant?.flashSale && (
@@ -359,6 +367,9 @@ export function ProductDetailClient({ initialData }: ProductDetailClientProps) {
               ))}
             </PanelBody>
           </Panel>
+
+          {/* Size Recommendation */}
+          <SizeRecommendation category={initialData.category?.slug ?? initialData.kind} />
 
           {/* Rating breakdown */}
           <Panel>

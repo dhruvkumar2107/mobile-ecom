@@ -7,6 +7,7 @@ import { Mail, Smartphone, Lock, Eye, EyeOff, Loader2, AlertCircle } from 'lucid
 import { Button } from '@/components/ui/button';
 import { Input, PasswordInput } from '@/components/ui/input';
 import { Panel, PanelBody, PanelHeader, PanelFooter } from '@/components/ui/panel';
+import { BiometricLogin } from '@/components/ui/biometric-login';
 import { api } from '@/lib/client';
 
 function LoginContent() {
@@ -146,6 +147,17 @@ function LoginContent() {
               </Link>
             </div>
           )}
+
+          <div className="relative my-2">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-line" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-panel-1 px-2 text-ink-4">or continue with</span>
+            </div>
+          </div>
+
+          <BiometricLogin onSuccess={() => router.push(next)} />
         </PanelBody>
         <PanelFooter>
           <p className="text-center text-sm text-ink-3">

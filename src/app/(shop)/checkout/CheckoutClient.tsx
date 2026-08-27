@@ -10,6 +10,7 @@ import { type Address } from '@prisma/client';
 import { Panel, PanelHeader, PanelBody, PanelFooter, Row, Badge, Divider } from '@/components/ui/panel';
 import { Button, ButtonLink } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
+import { ConfettiOnMount } from '@/components/ui/confetti';
 import { api } from '@/lib/client';
 
 type CheckoutClientProps = {
@@ -34,6 +35,7 @@ export function CheckoutClient({ cart, user, addresses }: CheckoutClientProps) {
   );
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'online'>('online');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [orderPlaced, setOrderPlaced] = useState(false);
 
   const subtotalPaise = cart.subtotalPaise + cart.protectionPaise;
   const deliveryPaise = subtotalPaise >= FREE_DELIVERY_THRESHOLD_PAISE ? 0 : 5_900;
@@ -59,6 +61,7 @@ export function CheckoutClient({ cart, user, addresses }: CheckoutClientProps) {
 
       if (res.ok) {
         const order = res.data as { id: string; orderNo: string };
+        setOrderPlaced(true);
         toast.success('Order placed successfully!');
         router.push(`/account/orders/${order.orderNo}`);
       } else {
@@ -73,6 +76,8 @@ export function CheckoutClient({ cart, user, addresses }: CheckoutClientProps) {
 
   return (
     <div className="space-y-6">
+      {orderPlaced && <ConfettiOnMount />}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">

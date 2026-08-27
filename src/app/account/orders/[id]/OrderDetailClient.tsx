@@ -11,6 +11,7 @@ import { ORDER_STATUS_META, type OrderStatus } from '@/lib/enums';
 import { Panel, PanelHeader, PanelBody, PanelFooter, Row, Badge, Divider, EmptyState } from '@/components/ui/panel';
 import { Button, ButtonLink } from '@/components/ui/button';
 import { Modal } from '@/components/ui/overlay';
+import { LiveOrderTracking } from '@/components/ui/live-order-tracking';
 import { getOrder } from '@/lib/services/orders';
 
 type OrderDetail = Awaited<ReturnType<typeof getOrder>>;
@@ -140,6 +141,11 @@ export function OrderDetailClient({ initialOrder }: OrderDetailClientProps) {
           </ButtonLink>
         </div>
       </div>
+
+      {/* Live order tracking for shipped orders */}
+      {['shipped', 'out_for_delivery'].includes(currentStatus) && (
+        <LiveOrderTracking orderId={order.id} />
+      )}
 
       {/* Timeline */}
       <Panel>

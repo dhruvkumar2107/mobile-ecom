@@ -11,6 +11,7 @@ import { ProductCard } from '@/components/mobile/ProductCard';
 import { ProductCardSkeleton } from '@/components/mobile/Skeleton';
 import { CategoryChips, defaultCategories } from '@/components/mobile/CategoryChips';
 import dynamic from 'next/dynamic';
+import { VoiceSearch } from '@/components/ui/voice-search';
 
 /**
  * The filter sheet is behind a tap, so keep Modal.tsx (and its focus-trap /
@@ -117,13 +118,14 @@ export default function SearchPage() {
                   leftIcon={<Search style={{ width: 20, height: 20 }} aria-hidden="true" />}
                   rightIcon={query ? (
                     <motion.button onClick={() => setQuery('')} whileTap={{ scale: 0.9 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', border: 'none', background: 'transparent', color: mobileDesign.colors.textTertiary, borderRadius: '6px', cursor: 'pointer' }} aria-label="Clear search"><X style={{ width: 16, height: 16 }} /></motion.button>
-                  ) : (
-                    <motion.button whileTap={{ scale: 0.9 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', border: 'none', background: 'transparent', color: mobileDesign.colors.textTertiary, cursor: 'pointer' }} aria-label="Voice search"><Mic style={{ width: 20, height: 20 }} /></motion.button>
-                  )}
+                  ) : null}
                   fullWidth
                   size="md"
                   variant="filled"
                 />
+                {!query && (
+                  <VoiceSearch onResult={(text) => setQuery(text)} />
+                )}
               </div>
               <motion.button onClick={() => setShowSearchSheet(true)} whileTap={{ scale: 0.95 }} style={{ padding: '0 16px', height: '44px', border: 'none', borderRadius: '12px', background: mobileDesign.colors.accent, color: mobileDesign.colors.textInverse, fontSize: '14px', fontWeight: 600, fontFamily: mobileDesign.typography.fontFamily, cursor: 'pointer', whiteSpace: 'nowrap' }}>
                 Search
@@ -158,13 +160,14 @@ export default function SearchPage() {
                     rightIcon={
                       query ? (
                         <motion.button onClick={() => setQuery('')} whileTap={{ scale: 0.9 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', border: 'none', background: 'transparent', color: mobileDesign.colors.textTertiary, borderRadius: '6px', cursor: 'pointer' }} aria-label="Clear search"><X style={{ width: 16, height: 16 }} /></motion.button>
-                      ) : (
-                        <motion.button whileTap={{ scale: 0.9 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', border: 'none', background: 'transparent', color: mobileDesign.colors.textTertiary, cursor: 'pointer' }} aria-label="Voice search"><Mic style={{ width: 20, height: 20 }} /></motion.button>
-                      )
+                      ) : null
                     }
                     fullWidth
                     size="lg"
                   />
+                  {!query && (
+                    <VoiceSearch onResult={(text) => setQuery(text)} />
+                  )}
                 </div>
                 <HapticButton variant="primary" size="lg" onClick={handleSearch} disabled={!query.trim()} loading={isLoading}>Search</HapticButton>
               </div>

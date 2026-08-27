@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import { getSettings } from '@/lib/services/settings';
 import { SiteHeader } from '@/components/site/header';
 import { SiteFooter } from '@/components/site/footer';
+import { PageTransition } from '@/components/ui/page-transition';
 
 /**
  * The `(shop)` route group wraps every storefront page. It resolves the
@@ -49,7 +50,7 @@ export default async function ShopLayout({
       />
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
-        {children}
+        <PageTransition>{children}</PageTransition>
       </main>
 
       <SiteFooter supportEmail={settings.supportEmail} supportPhone={settings.supportPhone} />
