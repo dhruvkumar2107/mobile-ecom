@@ -146,6 +146,30 @@ export const DELETE = route(async (req: Request) => {
 
   const input = await body(req, z.object({ itemId: z.string().min(1) }));
 
+  const wishlist = await db.wishlist.findFirst({
+    where: { userId: user.id },
+    select: { id: true },
+  });
+
+  if (!wishlist) {
+    return new Response(JSON.stringify({ error: 'Wishlist not found' }), {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const item = await db.wishlistItem.findFirst({
+    where: { id: input.itemId, wishlistId: wishlist.id },
+    select: { id: true },
+  });
+
+  if (!item) {
+    return new Response(JSON.stringify({ error: 'Item not found in your wishlist' }), {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   await db.wishlistItem.delete({
     where: { id: input.itemId },
   });

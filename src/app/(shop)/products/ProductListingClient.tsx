@@ -1,7 +1,7 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { X, ChevronDown, ChevronUp, SlidersHorizontal, Filter, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatINR } from '@/lib/money';
@@ -22,6 +22,20 @@ type ProductListingClientProps = {
   sortLabels: Record<string, string>;
 };
 
+const EMPTY_FACETS: Facets = {
+  brands: [],
+  categories: [],
+  kinds: [],
+  ram: [],
+  storage: [],
+  colors: [],
+  badges: [],
+  ratings: [],
+  price: { minPaise: 0, maxPaise: 0, buckets: [] },
+  availability: { inStock: 0, total: 0 },
+  specs: [],
+};
+
 export function ProductListingClient({
   initialResult,
   initialFilter,
@@ -32,7 +46,6 @@ export function ProductListingClient({
   sortLabels,
 }: ProductListingClientProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [result, setResult] = useState<ListResult>(initialResult);
   const [filter, setFilter] = useState<ProductFilter>(initialFilter);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +62,8 @@ export function ProductListingClient({
     price: true,
     specs: true,
   });
+
+  const facets: Facets = result.facets ?? EMPTY_FACETS;
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
@@ -94,7 +109,13 @@ export function ProductListingClient({
     setFilter({ page: 1, perPage: 12, sort: 'featured', loyaltyTier: filter.loyaltyTier });
   }, [filter.loyaltyTier]);
 
+  const prevFilterRef = useRef<string>(JSON.stringify(initialFilter));
+
   const fetchResults = useCallback(async () => {
+    const filterKey = JSON.stringify(filter);
+    if (filterKey === prevFilterRef.current) return;
+    prevFilterRef.current = filterKey;
+
     setIsLoading(true);
     const params = new URLSearchParams();
     Object.entries(filter).forEach(([key, value]) => {
@@ -112,8 +133,11 @@ export function ProductListingClient({
     try {
       const res = await fetch(`/api/products?${params.toString()}`);
       if (res.ok) {
-        const data = await res.json();
-        setResult(data);
+        const envelope = await res.json();
+        const data = envelope?.data ?? envelope;
+        if (data && data.facets && Array.isArray(data.items)) {
+          setResult(data);
+        }
       }
     } catch {
       // Keep current result on error
@@ -132,7 +156,7 @@ export function ProductListingClient({
     setFilter((prev) => ({ ...prev, page: (prev.page ?? 1) + 1 }));
   };
 
-  const priceRange = result.facets.price;
+  const priceRange = facets.price;
 
   return (
     <div className="space-y-6">
@@ -215,9 +239,9 @@ export function ProductListingClient({
               key="brands"
               expanded={expandedFacets.brands}
               onToggle={() => setExpandedFacets((p) => ({ ...p, brands: !p.brands }))}
-              count={result.facets.brands.length}
+              count={facets.brands.length}
             >
-              {result.facets.brands.map((b) => (
+              {facets.brands.map((b) => (
                 <FacetCheckbox
                   key={b.value}
                   label={b.label}
@@ -267,7 +291,7 @@ export function ProductListingClient({
               expanded={expandedFacets.ram}
               onToggle={() => setExpandedFacets((p) => ({ ...p, ram: !p.ram }))}
             >
-              {result.facets.ram.map((r) => (
+              {facets.ram.map((r) => (
                 <FacetCheckbox
                   key={r.value}
                   label={r.label}
@@ -284,7 +308,7 @@ export function ProductListingClient({
               expanded={expandedFacets.storage}
               onToggle={() => setExpandedFacets((p) => ({ ...p, storage: !p.storage }))}
             >
-              {result.facets.storage.map((s) => (
+              {facets.storage.map((s) => (
                 <FacetCheckbox
                   key={s.value}
                   label={s.label}
@@ -301,7 +325,7 @@ export function ProductListingClient({
               expanded={expandedFacets.colors}
               onToggle={() => setExpandedFacets((p) => ({ ...p, colors: !p.colors }))}
             >
-              {result.facets.colors.map((c) => (
+              {facets.colors.map((c) => (
                 <FacetColorCheckbox
                   key={c.value}
                   label={c.label}
@@ -320,7 +344,7 @@ export function ProductListingClient({
               expanded={expandedFacets.badges}
               onToggle={() => setExpandedFacets((p) => ({ ...p, badges: !p.badges }))}
             >
-              {result.facets.badges.map((b) => (
+              {facets.badges.map((b) => (
                 <FacetCheckbox
                   key={b.value}
                   label={b.label}
@@ -337,7 +361,7 @@ export function ProductListingClient({
               expanded={expandedFacets.ratings}
               onToggle={() => setExpandedFacets((p) => ({ ...p, ratings: !p.ratings }))}
             >
-              {result.facets.ratings.map((r) => (
+              {facets.ratings.map((r) => (
                 <FacetRadio
                   key={r.value}
                   label={r.label}
@@ -398,7 +422,7 @@ export function ProductListingClient({
             />
           )}
 
-          {!isLoading && result.items.length > 0 && (
+          {result.items.length > 0 && (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4" role="list">
               {result.items.map((product) => (
                 <ProductCard key={product.id} product={product} />

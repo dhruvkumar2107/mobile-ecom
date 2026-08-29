@@ -22,13 +22,11 @@ export const POST = route(async (req) => {
     return Response.json({ ok: true, data: { devToken: undefined } });
   }
 
-  let devToken: string | undefined;
   if (channel === 'email') {
-    devToken = await issueResetToken(user.id);
+    await issueResetToken(user.id);
   } else {
-    const otp = await issueOtp(identifier, 'sms', 'reset', clientIp(req));
-    devToken = otp.devCode;
+    await issueOtp(identifier, 'sms', 'reset', clientIp(req));
   }
 
-  return Response.json({ ok: true, data: { devToken } });
+  return Response.json({ ok: true });
 });

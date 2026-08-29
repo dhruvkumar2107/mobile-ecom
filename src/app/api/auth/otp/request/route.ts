@@ -16,5 +16,5 @@ export const POST = route(async (req) => {
   const ch = channel ?? (identifier.includes('@') ? 'email' : 'sms');
   const otp = await issueOtp(identifier, ch, purpose, clientIp(req));
 
-  return Response.json({ ok: true, data: { devCode: otp.devCode } });
+  return Response.json({ ok: true });
 });

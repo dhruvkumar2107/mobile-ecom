@@ -177,11 +177,11 @@ export function PullToRefresh({ onRefresh, children, threshold = 80, className, 
   const [isPulling, setIsPulling] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
-  const startY = useState(0);
+  const startY = useRef(0);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (window.scrollY === 0 && !isRefreshing) {
-      startY[0] = e.touches[0].clientY;
+      startY.current = e.touches[0].clientY;
       setIsPulling(true);
     }
   };
@@ -189,7 +189,7 @@ export function PullToRefresh({ onRefresh, children, threshold = 80, className, 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isPulling || isRefreshing) return;
     const currentY = e.touches[0].clientY;
-    const distance = currentY - startY[0];
+    const distance = currentY - startY.current;
     if (distance > 0) {
       e.preventDefault();
       setPullDistance(Math.min(distance * 0.5, threshold * 1.5));

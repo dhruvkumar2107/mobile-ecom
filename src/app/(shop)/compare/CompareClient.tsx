@@ -41,13 +41,13 @@ export function CompareClient({
   }, [allProducts, selectedSlugs]);
 
   const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) return availableProducts.slice(0, 20);
+    if (!searchQuery.trim()) return availableProducts;
     const q = searchQuery.toLowerCase();
     return availableProducts.filter(
       (p) =>
         p.name.toLowerCase().includes(q) ||
         p.brand.name.toLowerCase().includes(q)
-    ).slice(0, 20);
+    );
   }, [availableProducts, searchQuery]);
 
   const addToCompare = useCallback(

@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: BrandPageProps): Promise<Meta
   });
   if (!brand) return { title: 'Brand not found' };
   return {
-    title: `${brand.name} — VOLTAGE`,
+    title: brand.name,
     description: `Shop ${brand.name} devices at VOLTAGE. GST invoice, warranty tracked, no-cost EMI, same-day dispatch.`,
   };
 }

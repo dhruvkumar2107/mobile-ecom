@@ -19,6 +19,8 @@ interface FlyingItem {
   startY: number;
 }
 
+const MAX_PER_LINE = 5;
+
 interface CartStore {
   items: CartItem[];
   flyingItem: FlyingItem | null;
@@ -44,9 +46,10 @@ export const useCartStore = create<CartStore>()(
         set((state) => {
           const existing = state.items.find((i) => i.id === item.id);
           if (existing) {
+            const newQty = Math.min(existing.quantity + 1, MAX_PER_LINE);
             return {
               items: state.items.map((i) =>
-                i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+                i.id === item.id ? { ...i, quantity: newQty } : i
               ),
             };
           }
@@ -61,7 +64,7 @@ export const useCartStore = create<CartStore>()(
         set((state) => ({
           items: quantity <= 0
             ? state.items.filter((i) => i.id !== id)
-            : state.items.map((i) => (i.id === id ? { ...i, quantity } : i)),
+            : state.items.map((i) => (i.id === id ? { ...i, quantity: Math.min(quantity, MAX_PER_LINE) } : i)),
         })),
 
       clearCart: () => set({ items: [] }),
@@ -70,13 +73,13 @@ export const useCartStore = create<CartStore>()(
       totalItems: () => get().items.reduce((sum, i) => sum + (i.quantity || 0), 0),
       totalPrice: () => get().items.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 0)), 0),
     }),
-    { name: 'voltage-cart', version: 2, migrate: (persisted: any, version: number) => {
+    { name: 'voltage-cart', version: 3, migrate: (persisted: any, version: number) => {
       if (version < 2) {
-        // Clear stale cart data from old schema
         return { items: [], flyingItem: null };
       }
-      // Filter out items with missing/invalid price
-      const items = (persisted?.items ?? []).filter((i: any) => i && typeof i.price === 'number' && i.price > 0);
+      const items = (persisted?.items ?? [])
+        .filter((i: any) => i && typeof i.price === 'number' && i.price > 0)
+        .map((i: any) => ({ ...i, quantity: Math.min(i.quantity || 1, MAX_PER_LINE) }));
       return { ...persisted, items, flyingItem: null };
     }}
   )

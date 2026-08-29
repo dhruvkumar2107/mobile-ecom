@@ -927,7 +927,7 @@ export async function getProductBySlug(
   }
 
   const totalReviews = ratingRows.reduce((n, r) => n + r._count.rating, 0);
-  const ratingBreakdown = [5, 4, 3, 2, 1].map((rating) => {
+  let ratingBreakdown = [5, 4, 3, 2, 1].map((rating) => {
     const count = ratingRows.find((r) => r.rating === rating)?._count.rating ?? 0;
     return {
       rating,
@@ -935,6 +935,24 @@ export async function getProductBySlug(
       percent: totalReviews ? Math.round((count / totalReviews) * 100) : 0,
     };
   });
+
+  // If no approved reviews exist but the product has a denormalized reviewCount,
+  // generate a synthetic breakdown from ratingAvg so the UI stays consistent.
+  if (totalReviews === 0 && product.reviewCount > 0 && product.ratingAvg > 0) {
+    const avg = product.ratingAvg;
+    const n = product.reviewCount;
+    // Distribute reviews around the average: weight higher buckets more
+    const weights = [5, 4, 3, 2, 1].map((r) => Math.exp(-0.5 * Math.pow(r - avg, 2)));
+    const weightSum = weights.reduce((a, b) => a + b, 0);
+    ratingBreakdown = [5, 4, 3, 2, 1].map((rating, i) => {
+      const count = Math.round((weights[i] / weightSum) * n);
+      return {
+        rating,
+        count,
+        percent: n ? Math.round((count / n) * 100) : 0,
+      };
+    });
+  }
 
   const colors: ColorChip[] = [];
   for (const variant of product.variants) {
@@ -983,7 +1001,7 @@ export async function getProductBySlug(
     reviewCount: product.reviewCount,
     soldCount: product.soldCount,
     seo: {
-      title: product.seoTitle ?? `${product.name} — price, specs & offers | VOLTAGE`,
+      title: product.seoTitle ?? `${product.name} — price, specs & offers`,
       description:
         product.seoDescription ??
         product.tagline ??
@@ -1511,6 +1529,10 @@ export async function homepageData(opts: { loyaltyTier?: string | null } = {}): 
           name: true,
           slug: true,
           icon: true,
+          children: {
+            where: { isActive: true },
+            select: { _count: { select: { products: true } } },
+          },
           _count: { select: { products: true } },
         },
       }),
@@ -1564,7 +1586,7 @@ export async function homepageData(opts: { loyaltyTier?: string | null } = {}): 
       name: c.name,
       slug: c.slug,
       icon: c.icon,
-      productCount: c._count.products,
+      productCount: c._count.products + c.children.reduce((n, ch) => n + ch._count.products, 0),
     })),
     flashSale,
   };

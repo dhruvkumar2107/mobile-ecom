@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { unstable_cache } from 'next/cache';
 import { db } from '@/lib/db';
@@ -80,14 +81,36 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   }
 
   return (
-    <ProductListingClient
-      initialResult={data.result}
-      initialFilter={filter}
-      brands={data.brands}
-      categories={data.categories}
-      kinds={data.kinds}
-      sorts={CATALOG_SORTS}
-      sortLabels={CATALOG_SORT_LABEL}
-    />
+    <Suspense fallback={<ProductsSkeleton />}>
+      <ProductListingClient
+        initialResult={data.result}
+        initialFilter={filter}
+        brands={data.brands}
+        categories={data.categories}
+        kinds={data.kinds}
+        sorts={CATALOG_SORTS}
+        sortLabels={CATALOG_SORT_LABEL}
+      />
+    </Suspense>
+  );
+}
+
+function ProductsSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="h-8 w-48 bg-panel-2 shimmer rounded" />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[...Array(8)].map((_, i) => (
+          <div key={i} className="panel bevel rounded-2xl overflow-hidden">
+            <div className="aspect-[4/3] bg-panel-2 shimmer" />
+            <div className="p-3 space-y-1.5">
+              <div className="h-2.5 w-16 rounded bg-panel-2 shimmer" />
+              <div className="h-3.5 w-3/4 rounded bg-panel-2 shimmer" />
+              <div className="h-5 w-1/2 rounded bg-panel-2 shimmer" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

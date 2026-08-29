@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth';
 import { resolveCart, getCart } from '@/lib/services/cart';
+import { db } from '@/lib/db';
 import { CheckoutClient } from './CheckoutClient';
 
 export const metadata = {
@@ -26,8 +27,6 @@ export default async function CheckoutPage() {
     redirect('/cart');
   }
 
-  // Fetch user addresses
-  const { db } = await import('@/lib/db');
   const addresses = await db.address.findMany({
     where: { userId: user.id, deletedAt: null },
     orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }],

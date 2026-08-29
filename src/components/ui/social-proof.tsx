@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin } from 'lucide-react';
 
@@ -31,6 +31,11 @@ function generatePurchase() {
 export function SocialProofPopup() {
   const [notification, setNotification] = useState<ReturnType<typeof generatePurchase> | null>(null);
   const [visible, setVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const showNotification = useCallback(() => {
     const purchase = generatePurchase();
@@ -40,13 +45,14 @@ export function SocialProofPopup() {
   }, []);
 
   useEffect(() => {
+    if (!mounted) return;
     const firstDelay = setTimeout(showNotification, 4000 + Math.random() * 6000);
     const interval = setInterval(showNotification, 15000 + Math.random() * 20000);
     return () => {
       clearTimeout(firstDelay);
       clearInterval(interval);
     };
-  }, [showNotification]);
+  }, [showNotification, mounted]);
 
   return (
     <AnimatePresence>

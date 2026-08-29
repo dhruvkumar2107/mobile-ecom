@@ -11,8 +11,20 @@ import { Badge } from '@/components/ui/badge';
 import { ProductCard } from './card';
 import type { FlashSaleCountdownProps } from './types';
 
+function formatEndDate(dateStr: Date | string): string {
+  const d = new Date(dateStr);
+  const day = d.getDate();
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${day} ${months[d.getMonth()]} ${d.getFullYear()}, ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+}
+
 export function FlashSaleCountdown({ sale, items }: FlashSaleCountdownProps) {
   const [timeLeft, setTimeLeft] = useState<{ h: number; m: number; s: number }>({ h: 0, m: 0, s: 0 });
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!sale) return;
@@ -48,10 +60,12 @@ export function FlashSaleCountdown({ sale, items }: FlashSaleCountdownProps) {
               <div className="flex items-center gap-1.5 bg-volt-400/10 rounded-xl px-3 py-1.5 ring-1 ring-inset ring-volt-400/20">
                 <Clock className="size-3.5 text-volt-300" aria-hidden />
                 <span className="tabular font-mono font-medium text-volt-300">
-                  {timeLeft.h.toString().padStart(2, '0')}:{timeLeft.m.toString().padStart(2, '0')}:{timeLeft.s.toString().padStart(2, '0')}
+                  {mounted
+                    ? `${timeLeft.h.toString().padStart(2, '0')}:${timeLeft.m.toString().padStart(2, '0')}:${timeLeft.s.toString().padStart(2, '0')}`
+                    : '--:--:--'}
                 </span>
               </div>
-              <span className="text-ink-3 hidden lg:inline">Ends {new Date(sale.endsAt).toLocaleString()}</span>
+              <span className="text-ink-3 hidden lg:inline">Ends {formatEndDate(sale.endsAt)}</span>
             </div>
             <Link
               href="/products?badge=flash_sale"

@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { cache } from 'react';
 import { SignJWT, jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
-import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
+import { createHash, randomBytes, randomInt, timingSafeEqual } from 'node:crypto';
 import { db } from './db';
 import { referralCode as makeReferralCode } from './ids';
 import { hasPermission, type Permission } from './rbac';
@@ -261,7 +261,7 @@ export async function issueOtp(
     data: { consumedAt: new Date() },
   });
 
-  const code = String(Math.floor(100000 + Math.random() * 900000));
+  const code = String(randomInt(100000, 999999));
   const expiresAt = new Date(Date.now() + 10 * 60000);
 
   await db.otpCode.create({

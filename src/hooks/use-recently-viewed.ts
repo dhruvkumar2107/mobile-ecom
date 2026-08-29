@@ -12,6 +12,7 @@ interface RecentlyViewedProduct {
   brandName: string;
   pricePaise: number;
   mrpPaise: number;
+  inStock: boolean;
   viewedAt: Date;
 }
 

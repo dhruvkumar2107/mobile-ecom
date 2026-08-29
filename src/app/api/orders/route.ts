@@ -24,7 +24,7 @@ export const POST = route(async (req: Request) => {
   // Get user's cart
   const cart = await db.cart.findFirst({
     where: {
-      OR: [{ userId: user.id }, { sessionId: user.id }],
+      userId: user.id,
       status: 'active',
     },
     include: {
