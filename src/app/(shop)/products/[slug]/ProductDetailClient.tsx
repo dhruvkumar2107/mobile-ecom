@@ -16,6 +16,13 @@ import { ViewerCount, UrgencyIndicator } from '@/components/ui/social-proof';
 import { api } from '@/lib/client';
 import { type ProductDetail, type VariantView, type SpecGroup } from '@/lib/services/catalog';
 
+function formatEndDate(dateStr: Date | string): string {
+  const d = new Date(dateStr);
+  const day = d.getDate();
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${day} ${months[d.getMonth()]} ${d.getFullYear()}, ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+}
+
 type ProductDetailClientProps = {
   initialData: ProductDetail;
 };
@@ -254,7 +261,7 @@ export function ProductDetailClient({ initialData }: ProductDetailClientProps) {
                 <div className="p-3 rounded-lg bg-volt-400/10 ring-1 ring-inset ring-volt-400/30">
                   <p className="text-sm font-medium text-volt-300">Flash Sale Price</p>
                   <p className="text-2xl font-semibold text-volt-300 tabular">{formatINR(selectedVariant.flashSale.salePricePaise)}</p>
-                  <p className="text-xs text-ink-3">Ends {new Date(selectedVariant.flashSale.endsAt).toLocaleString()}</p>
+                  <p className="text-xs text-ink-3">Ends {formatEndDate(selectedVariant.flashSale.endsAt)}</p>
                 </div>
               )}
 

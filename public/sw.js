@@ -32,7 +32,15 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
 
-  if (request.url.includes('/api/') || request.url.includes('/_next/')) {
+  // Skip RSC requests — they are React Server Component payloads and must not
+  // be cached by the service worker (they contain per-request data and the
+  // cache-then-network pattern causes stale renders and hydration errors).
+  if (url.searchParams.has('_rsc')) return;
+
+  // Skip admin routes entirely — they require auth and are not cacheable.
+  if (url.pathname.startsWith('/admin')) return;
+
+  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_next/')) {
     event.respondWith(
       caches.open(CACHE_NAME).then((cache) =>
         fetch(request)
@@ -42,7 +50,7 @@ self.addEventListener('fetch', (event) => {
             }
             return response;
           })
-          .catch(() => cache.match(request))
+          .catch(() => cache.match(request).then((r) => r || new Response('', { status: 504 })))
       )
     );
     return;
@@ -58,7 +66,7 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         })
-        .catch(() => cached);
+        .catch(() => cached || new Response('', { status: 504 }));
 
       return cached || fetchPromise;
     })
