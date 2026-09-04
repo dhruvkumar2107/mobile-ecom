@@ -108,19 +108,21 @@ export function BannerCarousel({
             style={{
               position: 'absolute',
               inset: 0,
-              backgroundColor: banners[currentIndex].backgroundColor,
+              background: banners[currentIndex].gradient || banners[currentIndex].backgroundColor || 'linear-gradient(135deg, #2874F0 0%, #1E5FC0 100%)',
             }}
             aria-hidden="true"
           >
-            <Image
-              src={banners[currentIndex].image}
-              alt=""
-              fill
-              sizes="100vw"
-              quality={72}
-              priority={currentIndex === 0}
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
-            />
+            {banners[currentIndex].image && (
+              <Image
+                src={banners[currentIndex].image}
+                alt=""
+                fill
+                sizes="100vw"
+                quality={72}
+                priority={currentIndex === 0}
+                style={{ objectFit: 'cover', objectPosition: 'center' }}
+              />
+            )}
           </div>
           {banners[currentIndex].gradient && (
             <div
@@ -316,29 +318,32 @@ export function BannerCarousel({
 export const defaultBanners: Banner[] = [
   {
     id: '1',
-    image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=800&q=80',
-    title: 'Latest Flagship Drop',
-    subtitle: 'Experience the future of mobile technology',
+    image: '',
+    title: 'iPhone 15 Pro Max',
+    subtitle: 'Titanium. So strong. So light. So Pro.',
     ctaText: 'Shop Now',
-    ctaHref: '/mobile/category/smartphones',
-    gradient: 'linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.4) 100%)',
+    ctaHref: '/mobile',
+    gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+    backgroundColor: '#2874F0',
   },
   {
     id: '2',
-    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&q=80',
-    title: 'Premium Audio Collection',
-    subtitle: 'Immersive sound for every moment',
-    ctaText: 'Explore Audio',
-    ctaHref: '/mobile/category/audio',
-    gradient: 'linear-gradient(135deg, rgba(220, 38, 38, 0.85) 0%, rgba(124, 45, 18, 0.7) 100%)',
+    image: '',
+    title: 'Galaxy S24 Ultra',
+    subtitle: 'Galaxy AI is here',
+    ctaText: 'Explore',
+    ctaHref: '/mobile',
+    gradient: 'linear-gradient(135deg, #000000 0%, #1a1a2e 50%, #2d1b69 100%)',
+    backgroundColor: '#1428A0',
   },
   {
     id: '3',
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80',
-    title: 'Smart Wearables Sale',
-    subtitle: 'Track your fitness in style - up to 40% off',
-    ctaText: 'View Deals',
-    ctaHref: '/mobile/category/wearables',
-    gradient: 'linear-gradient(135deg, rgba(5, 150, 105, 0.85) 0%, rgba(4, 120, 87, 0.7) 100%)',
+    image: '',
+    title: 'Monsoon Mega Sale',
+    subtitle: 'Up to 60% off on top brands',
+    ctaText: 'Shop Deals',
+    ctaHref: '/mobile',
+    gradient: 'linear-gradient(135deg, #FF6B00 0%, #FF9F00 50%, #FFE500 100%)',
+    backgroundColor: '#FF9F00',
   },
 ];

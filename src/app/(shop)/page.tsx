@@ -25,12 +25,12 @@ async function getCachedHomeData(loyaltyTier: string | null): Promise<HomeData> 
   return homepageData({ loyaltyTier });
 }
 
-const CATEGORY_META: Record<string, { icon: React.ComponentType<{ className?: string }>; gradient: string; accent: string }> = {
-  mobiles: { icon: Smartphone, gradient: 'from-cyan-500/20 to-blue-600/10', accent: '#22d3ee' },
-  audio: { icon: Headphones, gradient: 'from-purple-500/20 to-violet-600/10', accent: '#a78bfa' },
-  wearables: { icon: Watch, gradient: 'from-emerald-500/20 to-teal-600/10', accent: '#34d399' },
-  tablets: { icon: Tablet, gradient: 'from-amber-500/20 to-orange-600/10', accent: '#fbbf24' },
-  accessories: { icon: Package, gradient: 'from-rose-500/20 to-pink-600/10', accent: '#fb7185' },
+const CATEGORY_META: Record<string, { icon: React.ComponentType<{ className?: string }>; gradient: string; accent: string; ring?: string }> = {
+  mobiles: { icon: Smartphone, gradient: 'from-cyan-500/20 to-blue-600/10', accent: '#22d3ee', ring: 'hover:ring-cyan-400/20' },
+  audio: { icon: Headphones, gradient: 'from-purple-500/20 to-violet-600/10', accent: '#a78bfa', ring: 'hover:ring-purple-400/20' },
+  wearables: { icon: Watch, gradient: 'from-emerald-500/20 to-teal-600/10', accent: '#34d399', ring: 'hover:ring-emerald-400/20' },
+  tablets: { icon: Tablet, gradient: 'from-amber-500/20 to-orange-600/10', accent: '#fbbf24', ring: 'hover:ring-amber-400/20' },
+  accessories: { icon: Package, gradient: 'from-rose-500/20 to-pink-600/10', accent: '#fb7185', ring: 'hover:ring-rose-400/20' },
 };
 
 export default async function HomePage() {
@@ -48,10 +48,13 @@ export default async function HomePage() {
 
       {/* ── Hero Section ────────────────────────────────────────────── */}
       <section aria-labelledby="hero-heading" className="relative -mx-4 sm:-mx-6 lg:-mx-8">
-        {/* Ambient glow background */}
+        {/* Ambient glow background — layered for depth */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-          <div className="absolute -top-1/2 -left-1/4 w-[800px] h-[800px] rounded-full bg-volt-500/8 blur-3xl" />
-          <div className="absolute -top-1/3 -right-1/4 w-[600px] h-[600px] rounded-full bg-plasma-500/6 blur-3xl" />
+          <div className="absolute -top-1/2 -left-1/4 w-[900px] h-[900px] rounded-full bg-volt-500/10 blur-[120px] animate-glow-pulse" />
+          <div className="absolute -top-1/3 -right-1/4 w-[700px] h-[700px] rounded-full bg-plasma-500/8 blur-[100px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-good-500/5 blur-[80px]" />
+          {/* Subtle grid overlay */}
+          <div className="absolute inset-0 dot-pattern opacity-30" />
         </div>
 
         <div className="relative px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
@@ -72,11 +75,11 @@ export default async function HomePage() {
                   Flagship phones, tablets, audio & wearables — genuine warranty, GST invoice, no-cost EMI. Same-day dispatch across India.
                 </p>
                 <div className="flex flex-wrap items-center gap-3">
-                  <ButtonLink href="/products" size="lg" className="shadow-lg shadow-volt-500/20">
+                  <ButtonLink href="/products" size="lg" className="shadow-lg shadow-volt-500/25 hover:shadow-volt-500/40 transition-shadow">
                     Shop now
                     <ArrowRight className="size-4 ml-2" aria-hidden />
                   </ButtonLink>
-                  <ButtonLink href="/compare" variant="outline" size="lg">
+                  <ButtonLink href="/compare" variant="outline" size="lg" className="hover:border-volt-400/50 hover:shadow-glow transition-all">
                     Compare devices
                   </ButtonLink>
                 </div>
@@ -100,19 +103,22 @@ export default async function HomePage() {
               <div className="lg:col-span-5 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   {data.categories.slice(0, 4).map((cat) => {
-                    const meta = CATEGORY_META[cat.slug] ?? { icon: Package, gradient: 'from-gray-500/20 to-gray-600/10', accent: '#94a3b8' };
+                    const meta = CATEGORY_META[cat.slug] ?? { icon: Package, gradient: 'from-gray-500/20 to-gray-600/10', accent: '#94a3b8', ring: 'ring-gray-500/20' };
                     const Icon = meta.icon;
                     return (
                       <Link
                         key={cat.id}
                         href={`/category/${cat.slug}`}
-                        className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${meta.gradient} border border-white/5 p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:border-white/10`}
+                        className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${meta.gradient} border border-white/5 p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.03] hover:border-white/10 hover:ring-1 ${meta.ring ?? 'hover:ring-volt-400/20'}`}
                       >
-                        <div className="size-6 mb-2 transition-transform group-hover:scale-110" style={{ color: meta.accent }}>
-                          <Icon className="size-full" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="relative">
+                          <div className="size-6 mb-2 transition-transform group-hover:scale-110 group-hover:rotate-3" style={{ color: meta.accent }}>
+                            <Icon className="size-full" />
+                          </div>
+                          <h3 className="text-sm font-semibold text-ink">{cat.name}</h3>
+                          <p className="text-[11px] text-ink-3 mt-0.5">{cat.productCount} devices</p>
                         </div>
-                        <h3 className="text-sm font-semibold text-ink">{cat.name}</h3>
-                        <p className="text-[11px] text-ink-3 mt-0.5">{cat.productCount} devices</p>
                         <ChevronRight className="absolute top-3 right-3 size-4 text-ink-4 opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-0.5" />
                       </Link>
                     );
@@ -153,19 +159,26 @@ export default async function HomePage() {
       )}
 
       {/* ── Promo Banner ────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-volt-500/10 via-plasma-500/10 to-volt-500/10 border border-white/5 p-6 sm:p-8">
-        <div className="absolute inset-0 bg-gradient-to-r from-volt-500/5 to-transparent pointer-events-none" />
+      <section className="relative overflow-hidden rounded-2xl border border-white/5 p-6 sm:p-8">
+        {/* Multi-layer gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-volt-500/12 via-plasma-500/8 to-volt-500/12" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20" />
+        <div className="absolute top-0 left-1/4 w-[300px] h-[300px] rounded-full bg-volt-400/10 blur-[80px] pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-[250px] h-[250px] rounded-full bg-plasma-400/8 blur-[60px] pointer-events-none" />
+        <div className="absolute inset-0 dot-pattern opacity-20 pointer-events-none" />
         <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Percent className="size-5 text-volt-300" />
+              <div className="flex size-8 items-center justify-center rounded-lg bg-volt-400/15">
+                <Percent className="size-4 text-volt-300" />
+              </div>
               <h2 className="text-lg sm:text-xl font-semibold text-ink">No-Cost EMI on all phones</h2>
             </div>
             <p className="text-sm text-ink-2 max-w-md">
               Up to 24 months. HDFC, ICICI, SBI, Axis & more. Credit, debit & cardless options available.
             </p>
           </div>
-          <ButtonLink href="/products" variant="outline" size="sm" className="shrink-0">
+          <ButtonLink href="/products" variant="outline" size="sm" className="shrink-0 hover:border-volt-400/50 hover:shadow-glow transition-all">
             Explore EMI options
             <ArrowRight className="size-3.5 ml-1.5" aria-hidden />
           </ButtonLink>
@@ -256,14 +269,14 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-volt-500/3 to-transparent pointer-events-none" aria-hidden="true" />
         <div className="relative grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { icon: BadgeCheck, title: 'Genuine warranty', desc: 'Every IMEI registered. Claims honoured by brand service centres.', color: 'text-good-400', bg: 'bg-good-400/10' },
-            { icon: Truck, title: 'Fast, insured delivery', desc: 'Same-day dispatch in metros. Tracked, insured, signature on delivery.', color: 'text-volt-300', bg: 'bg-volt-400/10' },
-            { icon: ShieldCheck, title: 'No-cost EMI', desc: 'Up to 24 months. Credit, debit & cardless options from major banks.', color: 'text-plasma-300', bg: 'bg-plasma-400/10' },
-            { icon: Zap, title: 'Exchange & upgrade', desc: 'Instant credit for your old device. Doorstep pickup, data-safe wipe.', color: 'text-warn-400', bg: 'bg-warn-400/10' },
-          ].map(({ icon: Icon, title, desc, color, bg }, i) => (
-            <Panel key={i} flat className="p-5 text-center glass-card group hover:shadow-lift transition-all duration-300">
-              <div className={`mx-auto flex size-11 items-center justify-center rounded-xl ${bg} ${color} transition-transform group-hover:scale-110`}>
-                <Icon className="size-5" aria-hidden />
+            { icon: BadgeCheck, title: 'Genuine warranty', desc: 'Every IMEI registered. Claims honoured by brand service centres.', color: 'text-good-400', bg: 'bg-good-400/10', glow: 'group-hover:shadow-[0_0_30px_-8px_rgb(52_211_153_/_0.4)]' },
+            { icon: Truck, title: 'Fast, insured delivery', desc: 'Same-day dispatch in metros. Tracked, insured, signature on delivery.', color: 'text-volt-300', bg: 'bg-volt-400/10', glow: 'group-hover:shadow-[0_0_30px_-8px_rgb(34_211_238_/_0.4)]' },
+            { icon: ShieldCheck, title: 'No-cost EMI', desc: 'Up to 24 months. Credit, debit & cardless options from major banks.', color: 'text-plasma-300', bg: 'bg-plasma-400/10', glow: 'group-hover:shadow-[0_0_30px_-8px_rgb(167_139_250_/_0.4)]' },
+            { icon: Zap, title: 'Exchange & upgrade', desc: 'Instant credit for your old device. Doorstep pickup, data-safe wipe.', color: 'text-warn-400', bg: 'bg-warn-400/10', glow: 'group-hover:shadow-[0_0_30px_-8px_rgb(251_191_36_/_0.4)]' },
+          ].map(({ icon: Icon, title, desc, color, bg, glow }, i) => (
+            <Panel key={i} flat className={`p-5 text-center glass-card group hover:shadow-lift ${glow} transition-all duration-300`}>
+              <div className={`mx-auto flex size-12 items-center justify-center rounded-xl ${bg} ${color} transition-all duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+                <Icon className="size-6" aria-hidden />
               </div>
               <h3 className="mt-3 text-sm font-semibold text-ink">{title}</h3>
               <p className="mt-1.5 text-xs text-ink-3 leading-relaxed">{desc}</p>

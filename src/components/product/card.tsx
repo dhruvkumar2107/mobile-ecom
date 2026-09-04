@@ -44,7 +44,7 @@ export function ProductCard({
       role="listitem"
       aria-label={`${product.name} — ${formatINR(product.finalPaise)}${product.discountPercent ? ` (${product.discountPercent}% off)` : ''}`}
     >
-      <Panel flat className="relative h-full overflow-hidden transition-all duration-300 group-hover:shadow-lift group-hover:glass-card rounded-2xl">
+      <Panel flat className="relative h-full overflow-hidden transition-all duration-300 group-hover:shadow-lift group-hover:shadow-volt-500/10 group-hover:glass-card rounded-2xl group-hover:border-volt-400/20">
         {/* Wishlist Button */}
         <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
           <WishlistButton productId={product.id} size="sm" />

@@ -55,22 +55,29 @@ function LoginContent() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-12 sm:py-16">
-      <Link href="/" className="inline-flex items-center gap-2 mb-8 text-ink-2 hover:text-ink" aria-label="Voltage home">
-        <svg viewBox="0 0 32 32" className="size-8" fill="none" aria-hidden="true">
-          <rect x="4" y="4" width="24" height="24" rx="6" fill="url(#loginGrad)" stroke="#22d3ee" strokeWidth="1.5" />
-          <defs>
-            <linearGradient id="loginGrad" x1="0" y1="0" x2="32" y2="32">
-              <stop offset="0%" stopColor="#06b6d4" />
-              <stop offset="100%" stopColor="#8b5cf6" />
-            </linearGradient>
-          </defs>
-          <path d="M10 16l6 6 10-10" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-        </svg>
-        <span className="text-xl font-semibold tracking-tight">VOLTAGE</span>
-      </Link>
+      {/* Background ambient glow */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        <div className="absolute -top-1/2 -left-1/4 w-[600px] h-[600px] rounded-full bg-volt-500/6 blur-3xl" />
+        <div className="absolute -bottom-1/3 -right-1/4 w-[500px] h-[500px] rounded-full bg-plasma-500/5 blur-3xl" />
+      </div>
 
-      <Panel>
-        <PanelHeader title="Welcome back" description="Sign in to access your account, orders and wallet." />
+      <div className="relative">
+        <Link href="/" className="inline-flex items-center gap-2 mb-8 text-ink-2 hover:text-ink" aria-label="Voltage home">
+          <svg viewBox="0 0 32 32" className="size-8" fill="none" aria-hidden="true">
+            <rect x="4" y="4" width="24" height="24" rx="6" fill="url(#loginGrad)" stroke="#22d3ee" strokeWidth="1.5" />
+            <defs>
+              <linearGradient id="loginGrad" x1="0" y1="0" x2="32" y2="32">
+                <stop offset="0%" stopColor="#06b6d4" />
+                <stop offset="100%" stopColor="#8b5cf6" />
+              </linearGradient>
+            </defs>
+            <path d="M10 16l6 6 10-10" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          </svg>
+          <span className="text-xl font-semibold tracking-tight text-gradient">VOLTAGE</span>
+        </Link>
+
+        <Panel>
+          <PanelHeader title="Welcome back" description="Sign in to access your account, orders and wallet." />
         <PanelBody className="space-y-4">
           <div className="flex gap-2" role="tablist">
             <button
@@ -153,7 +160,7 @@ function LoginContent() {
               <div className="w-full border-t border-line" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-panel-1 px-2 text-ink-4">or continue with</span>
+              <span className="bg-panel px-2 text-ink-4">or continue with</span>
             </div>
           </div>
 
@@ -167,7 +174,8 @@ function LoginContent() {
             </Link>
           </p>
         </PanelFooter>
-      </Panel>
+        </Panel>
+      </div>
     </div>
   );
 }

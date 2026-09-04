@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     default: 'Voltage',
     template: '%s · Voltage',
   },
-  description: 'Premium mobiles and electronics, delivered fast.',
+  description: 'Premium mobiles and electronics, delivered fast. Best prices on iPhone, Samsung, OnePlus, Xiaomi and more.',
   manifest: '/manifest.webmanifest',
   icons: {
     icon: [
@@ -21,17 +21,18 @@ export const metadata: Metadata = {
     title: 'Voltage',
     statusBarStyle: 'default',
   },
+  openGraph: {
+    title: 'Voltage - Premium Mobiles & Electronics',
+    description: 'Best prices on iPhone, Samsung, OnePlus, Xiaomi and more. Fast delivery, EMI options, genuine warranty.',
+    type: 'website',
+    locale: 'en_IN',
+  },
 };
 
-/**
- * The mobile app is a light-theme surface, unlike the dark desktop site.
- * `viewportFit: 'cover'` lets the tab bar and sticky footers extend into the
- * home-indicator area, which the screens pad back out with env(safe-area-inset-*).
- */
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#FAFAFA' },
-    { media: '(prefers-color-scheme: dark)', color: '#FAFAFA' },
+    { media: '(prefers-color-scheme: light)', color: '#F1F3F6' },
+    { media: '(prefers-color-scheme: dark)', color: '#F1F3F6' },
   ],
   colorScheme: 'light',
   width: 'device-width',

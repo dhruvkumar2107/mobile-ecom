@@ -62,7 +62,7 @@ export function SocialProofPopup() {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -400, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-          className="fixed bottom-24 left-4 z-40 max-w-xs"
+          className="fixed bottom-28 left-4 z-40 max-w-xs"
         >
           <div className="rounded-xl border border-line/30 bg-panel/85 backdrop-blur-xl p-3 shadow-xl shadow-black/30">
             <div className="flex items-start gap-3">

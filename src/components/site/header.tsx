@@ -78,15 +78,17 @@ export function SiteHeader({
   return (
     <>
       {announcement.enabled && announcement.text && (
-        <div className="border-b border-line bg-gradient-to-r from-volt-500/10 via-plasma-500/10 to-volt-500/10">
-          <p className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-[12px] leading-snug text-ink-2 sm:px-6 lg:px-8">
+        <div className="border-b border-line bg-gradient-to-r from-volt-500/10 via-plasma-500/8 to-volt-500/10 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent pointer-events-none" />
+          <p className="relative mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-[12px] leading-snug text-ink-2 sm:px-6 lg:px-8">
             <Zap className="size-3 shrink-0 fill-volt-300 text-volt-300" aria-hidden />
             {announcement.text}
           </p>
         </div>
       )}
 
-      <header className="sticky top-0 z-50 border-b border-line bg-void/75 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-line bg-void/80 backdrop-blur-xl relative">
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-volt-500/15 to-transparent" aria-hidden="true" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center gap-2 sm:gap-3">
             <button

@@ -49,7 +49,8 @@ export function FlashSaleCountdown({ sale, items }: FlashSaleCountdownProps) {
   return (
     <section className="relative" aria-labelledby="flash-sale-heading">
       <div className="panel bevel relative overflow-hidden ring-1 ring-volt-400/30">
-        <div className="absolute inset-0 bg-gradient-to-r from-volt-500/5 via-transparent to-volt-500/5" aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-r from-volt-500/8 via-transparent to-volt-500/8" aria-hidden />
+        <div className="absolute top-0 left-1/3 w-[300px] h-[300px] rounded-full bg-volt-400/5 blur-[80px] pointer-events-none" aria-hidden />
         <div className="relative p-5 lg:p-8 lg:grid lg:grid-cols-[auto_1fr] lg:gap-8 lg:items-center">
           <div className="flex flex-col items-center gap-3 lg:items-start text-center lg:text-left">
             <div className="flex items-center gap-2">

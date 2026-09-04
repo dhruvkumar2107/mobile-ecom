@@ -168,6 +168,21 @@ html:has(.mobile-root) body {
   line-clamp: 3;
 }
 
+/* Loading spinner for product images. */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Hide scrollbar for category chips */
+.mobile-root .no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.mobile-root .no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Respect the OS setting — animation is decoration, never the only signal. */
 @media (prefers-reduced-motion: reduce) {
   .mobile-root *,

@@ -8,16 +8,16 @@ import { cn } from '@/lib/utils';
 const VARIANTS = {
   /** The one true CTA — reserve for the primary action on a screen. */
   primary:
-    'bg-volt-400 text-void font-semibold hover:bg-volt-300 active:bg-volt-500 shadow-[0_8px_30px_-10px_rgb(34_211_238_/_0.6)]',
+    'bg-volt-400 text-void font-semibold hover:bg-volt-300 active:bg-volt-500 shadow-[0_8px_30px_-10px_rgb(34_211_238_/_0.6)] hover:shadow-[0_8px_40px_-8px_rgb(34_211_238_/_0.8)]',
   secondary:
     'bg-panel-2 text-ink ring-1 ring-inset ring-line-2 hover:bg-line hover:ring-line-2',
   outline:
-    'bg-transparent text-ink ring-1 ring-inset ring-line-2 hover:bg-panel-2 hover:ring-volt-400/40',
+    'bg-transparent text-ink ring-1 ring-inset ring-line-2 hover:bg-panel-2 hover:ring-volt-400/40 hover:shadow-[0_0_20px_-6px_rgb(34_211_238_/_0.2)]',
   ghost: 'bg-transparent text-ink-2 hover:bg-panel-2 hover:text-ink',
   danger:
     'bg-bad-500/12 text-bad-400 ring-1 ring-inset ring-bad-500/30 hover:bg-bad-500/20',
   wallet:
-    'bg-plasma-500 text-white font-semibold hover:bg-plasma-400 shadow-[0_8px_30px_-10px_rgb(139_92_246_/_0.6)]',
+    'bg-plasma-500 text-white font-semibold hover:bg-plasma-400 shadow-[0_8px_30px_-10px_rgb(139_92_246_/_0.6)] hover:shadow-[0_8px_40px_-8px_rgb(139_92_246_/_0.8)]',
   link: 'bg-transparent text-volt-300 underline underline-offset-4 hover:text-volt-200 px-0',
 } as const;
 

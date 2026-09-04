@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ChevronRight, Mail, MessageSquare, Phone, Truck, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { BrandMark } from './brand-mark';
 
 export function SiteFooter({
   supportEmail,
@@ -12,7 +13,9 @@ export function SiteFooter({
   supportPhone: string;
 }) {
   return (
-    <footer className="border-t border-line bg-abyss/40" aria-labelledby="footer-heading">
+    <footer className="relative border-t border-line bg-abyss/40" aria-labelledby="footer-heading">
+      {/* Subtle top glow */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-volt-500/20 to-transparent" aria-hidden="true" />
       <h2 id="footer-heading" className="sr-only">
         Footer
       </h2>
@@ -20,42 +23,23 @@ export function SiteFooter({
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <Link href="/" className="inline-flex" aria-label="VOLTAGE — home">
-              <svg
-                viewBox="0 0 32 32"
-                fill="none"
-                className="size-8"
-                aria-hidden="true"
-              >
-                <rect
-                  width="32"
-                  height="32"
-                  rx="6"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                />
-                <path
-                  d="M8 16h16M16 8v16"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
+              <BrandMark size="md" />
             </Link>
-            <p className="mt-4 max-w-xs text-sm text-ink-3">
+            <p className="mt-4 max-w-xs text-sm text-ink-3 leading-relaxed">
               Ultra-premium mobile & electronics commerce. GST-invoiced,
               warranty-tracked, same-day dispatch.
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-4">
               <a
                 href={`mailto:${supportEmail}`}
-                className="flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
+                className="flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-volt-300"
               >
                 <Mail className="size-4" aria-hidden />
                 {supportEmail}
               </a>
               <a
                 href={`tel:${supportPhone}`}
-                className="flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
+                className="flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-volt-300"
               >
                 <Phone className="size-4" aria-hidden />
                 {supportPhone}
@@ -64,178 +48,89 @@ export function SiteFooter({
           </div>
 
           <nav aria-label="Shop">
-            <h3 className="text-sm font-semibold tracking-wide text-ink-4 uppercase">Shop</h3>
-            <ul className="mt-3 space-y-2" role="list">
-              <li>
-                <Link
-                  href="/category/mobiles"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Phones
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/category/tablets"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Tablets
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/category/audio"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Audio
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/category/wearables"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Wearables
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/category/accessories"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Accessories
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/products"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  All devices
-                </Link>
-              </li>
+            <h3 className="text-sm font-semibold tracking-wide text-ink uppercase">Shop</h3>
+            <ul className="mt-3 space-y-2.5" role="list">
+              {[
+                { href: '/category/mobiles', label: 'Phones' },
+                { href: '/category/tablets', label: 'Tablets' },
+                { href: '/category/audio', label: 'Audio' },
+                { href: '/category/wearables', label: 'Wearables' },
+                { href: '/category/accessories', label: 'Accessories' },
+                { href: '/products', label: 'All devices' },
+              ].map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-ink-2 transition-colors hover:text-volt-300 hover:pl-1 transition-all duration-200"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
 
           <nav aria-label="Tools">
-            <h3 className="text-sm font-semibold tracking-wide text-ink-4 uppercase">Tools</h3>
-            <ul className="mt-3 space-y-2" role="list">
-              <li>
-                <Link
-                  href="/compare"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Compare devices
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/track"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Track order
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/service-centres"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Service centres
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/p/warranty-policy"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Warranty policy
-                </Link>
-              </li>
+            <h3 className="text-sm font-semibold tracking-wide text-ink uppercase">Tools</h3>
+            <ul className="mt-3 space-y-2.5" role="list">
+              {[
+                { href: '/compare', label: 'Compare devices' },
+                { href: '/track', label: 'Track order' },
+                { href: '/service-centres', label: 'Service centres' },
+                { href: '/p/warranty-policy', label: 'Warranty policy' },
+              ].map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-ink-2 transition-colors hover:text-volt-300 hover:pl-1 transition-all duration-200"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
 
           <nav aria-label="Company">
-            <h3 className="text-sm font-semibold tracking-wide text-ink-4 uppercase">Company</h3>
-            <ul className="mt-3 space-y-2" role="list">
-              <li>
-                <Link
-                  href="/p/about"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  About VOLTAGE
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/p/careers"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Careers
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/p/press"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Press
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/p/sustainability"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Sustainability
-                </Link>
-              </li>
+            <h3 className="text-sm font-semibold tracking-wide text-ink uppercase">Company</h3>
+            <ul className="mt-3 space-y-2.5" role="list">
+              {[
+                { href: '/p/about', label: 'About VOLTAGE' },
+                { href: '/p/careers', label: 'Careers' },
+                { href: '/p/press', label: 'Press' },
+                { href: '/p/sustainability', label: 'Sustainability' },
+              ].map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-ink-2 transition-colors hover:text-volt-300 hover:pl-1 transition-all duration-200"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
 
           <nav aria-label="Legal">
-            <h3 className="text-sm font-semibold tracking-wide text-ink-4 uppercase">Legal</h3>
-            <ul className="mt-3 space-y-2" role="list">
-              <li>
-                <Link
-                  href="/p/privacy"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Privacy policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/p/terms"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Terms of service
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/p/returns"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Returns & refunds
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/p/shipping"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Shipping policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/p/grievance"
-                  className="text-sm text-ink-2 transition-colors hover:text-ink"
-                >
-                  Grievance officer
-                </Link>
-              </li>
+            <h3 className="text-sm font-semibold tracking-wide text-ink uppercase">Legal</h3>
+            <ul className="mt-3 space-y-2.5" role="list">
+              {[
+                { href: '/p/privacy', label: 'Privacy policy' },
+                { href: '/p/terms', label: 'Terms of service' },
+                { href: '/p/returns', label: 'Returns & refunds' },
+                { href: '/p/shipping', label: 'Shipping policy' },
+                { href: '/p/grievance', label: 'Grievance officer' },
+              ].map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-ink-2 transition-colors hover:text-volt-300 hover:pl-1 transition-all duration-200"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
         </div>
@@ -247,13 +142,13 @@ export function SiteFooter({
           <div className="flex items-center gap-6">
             <a
               href="/p/accessibility"
-              className="text-xs text-ink-4 transition-colors hover:text-ink"
+              className="text-xs text-ink-4 transition-colors hover:text-volt-300"
             >
               Accessibility
             </a>
             <a
               href="/p/sitemap"
-              className="text-xs text-ink-4 transition-colors hover:text-ink"
+              className="text-xs text-ink-4 transition-colors hover:text-volt-300"
             >
               Sitemap
             </a>

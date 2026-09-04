@@ -4,10 +4,12 @@ import { referralCode } from '@/lib/ids';
 
 import { seedFoundation } from './seed/foundation';
 import { seedCatalog } from './seed/catalog';
+import { seedBanners } from './seed/banners';
 
 const MODULES = [
   ['Foundation — settings, roles, warehouses, zones, pincodes', seedFoundation],
   ['Catalogue — brands, categories, specs, products, variants', seedCatalog],
+  ['Banners — hero banners for homepage carousel', seedBanners],
   ['Admin Users — superadmin with all permissions', seedAdminUsers],
 ] as const satisfies ReadonlyArray<readonly [string, () => Promise<void>]>;
 
@@ -27,6 +29,7 @@ async function wipe(): Promise<void> {
     'PincodeServiceability', 'ShippingZone', 'Warehouse', 'Supplier', 'TaxRule',
     'SpecDefinition', 'Category', 'Brand',
     'Product',  // Add Product table
+    'Banner',
     'User', 'StaffRole', 'Setting',
     'WebhookEvent',
   ];

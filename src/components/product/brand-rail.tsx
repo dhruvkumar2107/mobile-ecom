@@ -18,14 +18,14 @@ export function BrandRail({
         <Link
           key={brand.id}
           href={`/brand/${brand.slug}`}
-          className="group shrink-0 w-28 sm:w-32 flex flex-col items-center gap-2 rounded-xl p-3 transition-colors hover:bg-panel-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-volt-400 focus-visible:ring-offset-2 focus-visible:ring-offset-void"
+          className="group shrink-0 w-28 sm:w-32 flex flex-col items-center gap-2 rounded-xl p-3 transition-all duration-300 hover:bg-panel-2 hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-volt-400 focus-visible:ring-offset-2 focus-visible:ring-offset-void"
           role="listitem"
         >
           <div
-            className="relative size-16 sm:size-20 rounded-xl flex items-center justify-center ring-1 ring-line transition-all duration-300 group-hover:ring-volt-400/50"
+            className="relative size-16 sm:size-20 rounded-xl flex items-center justify-center ring-1 ring-line transition-all duration-300 group-hover:ring-volt-400/50 group-hover:shadow-[0_0_20px_-4px_var(--tw-ring-color)]"
             style={{ backgroundColor: `${brand.accent}15` }}
           >
-            <span className="text-lg font-semibold tracking-[0.1em] uppercase" style={{ color: brand.accent }}>
+            <span className="text-lg font-semibold tracking-[0.1em] uppercase transition-transform duration-300 group-hover:scale-110" style={{ color: brand.accent }}>
               {brand.name.charAt(0)}
             </span>
           </div>
