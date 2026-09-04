@@ -161,7 +161,6 @@ export default function ProductDetailClient({
         name: product.name,
         price: currentVariant.finalPaise / 100,
         image: currentImage || '/icon.svg',
-        quantity,
         brand: product.brand,
       });
       setCartCount(totalItems() + quantity);

@@ -23,7 +23,7 @@ async function getReviews(productId: string) {
         id: true,
         rating: true,
         title: true,
-        text: true,
+        body: true,
         createdAt: true,
         user: { select: { name: true } },
       },
@@ -31,8 +31,8 @@ async function getReviews(productId: string) {
     return reviews.map(r => ({
       id: r.id,
       rating: r.rating,
-      title: r.title,
-      text: r.text,
+      title: r.title || '',
+      text: r.body,
       date: r.createdAt.toISOString(),
       user: r.user?.name || 'Anonymous',
     }));
@@ -92,7 +92,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         tagline: product.tagline || '',
         description: product.description || '',
         brand: product.brand.name,
-        brandId: product.brandId,
+        brandId: product.brand.id,
         category: product.category.name,
         imageUrl: product.imageUrl || '',
         badges: product.badges,
@@ -119,10 +119,10 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         discountPercent: v.discountPercent,
         inStock: v.inStock,
         lowStock: v.lowStock,
-        imageUrl: v.imageUrl,
+        imageUrl: v.imageUrl ?? null,
         isDefault: v.isDefault,
       }))}
-      colors={product.colors}
+      colors={product.colors.map(c => ({ ...c, finish: c.finish || '' }))}
       ramOptions={product.ramOptions}
       storageOptions={product.storageOptions}
       specGroups={product.specGroups.map(g => ({
@@ -135,7 +135,13 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           isKeySpec: r.isKeySpec,
         })),
       }))}
-      keySpecs={product.keySpecs}
+      keySpecs={product.keySpecs.map(s => ({
+        key: s.key,
+        label: s.label,
+        value: s.value,
+        unit: s.unit || '',
+        isKeySpec: true,
+      }))}
       ratingBreakdown={product.ratingBreakdown}
       defaultVariantId={product.defaultVariantId}
       reviews={reviews}

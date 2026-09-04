@@ -58,13 +58,13 @@ async function getCategories() {
       where: { isActive: true },
       orderBy: { sortOrder: 'asc' },
       take: 10,
-      select: { id: true, name: true, slug: true, imageUrl: true },
+      select: { id: true, name: true, slug: true, icon: true },
     });
     return categories.map(c => ({
       id: c.id,
       name: c.name,
       slug: c.slug,
-      image: c.imageUrl || '/icon.svg',
+      image: c.icon || '/icon.svg',
     }));
   } catch {
     return [];

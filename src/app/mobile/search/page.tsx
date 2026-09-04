@@ -317,7 +317,6 @@ export default function SearchPage() {
                       onPress={() => {}}
                       onWishlistToggle={() => {}}
                       isInWishlist={false}
-                      aspectRatio="4/3"
                       priority={index < 2}
                     />
                   </motion.div>
