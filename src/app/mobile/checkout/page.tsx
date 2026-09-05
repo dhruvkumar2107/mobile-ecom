@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, MapPin, CreditCard, Smartphone, Check, Lock, Truck, Gift, X, Plus } from 'lucide-react';
+import { ChevronLeft, MapPin, CreditCard, Smartphone, Check, Lock, Truck, Gift, X, Plus, Shield, Zap, Clock, Package, ChevronRight, Info, Star, ArrowRight } from 'lucide-react';
 import { mobileDesign } from '@/lib/mobile-design';
 import { MobileImage } from '@/components/mobile/MobileImage';
 import { BottomTabNavigation } from '@/components/mobile/BottomTabNavigation';
@@ -11,17 +11,17 @@ import { formatINR } from '@/lib/money';
 import { useCartStore } from '@/stores/cart';
 
 const checkoutSteps = [
-  { id: 'address', label: 'Delivery' },
-  { id: 'payment', label: 'Payment' },
-  { id: 'review', label: 'Review' },
+  { id: 'address', label: 'Delivery', icon: MapPin },
+  { id: 'payment', label: 'Payment', icon: CreditCard },
+  { id: 'review', label: 'Review', icon: Package },
 ];
 
 const paymentMethods = [
-  { id: 'upi', name: 'UPI', icon: <Smartphone style={{ width: 20, height: 20 }} />, details: 'PhonePe, Google Pay, Paytm' },
+  { id: 'upi', name: 'UPI', icon: <Smartphone style={{ width: 20, height: 20 }} />, details: 'PhonePe, Google Pay, Paytm', popular: true },
   { id: 'card', name: 'Credit/Debit Card', icon: <CreditCard style={{ width: 20, height: 20 }} />, details: 'Visa, Mastercard, RuPay' },
   { id: 'netbanking', name: 'Net Banking', icon: <Lock style={{ width: 20, height: 20 }} />, details: 'All major banks' },
   { id: 'wallet', name: 'Wallet', icon: <Gift style={{ width: 20, height: 20 }} />, details: 'Voltage Wallet' },
-  { id: 'cod', name: 'Cash on Delivery', icon: <Truck style={{ width: 20, height: 20 }} />, details: 'Pay on delivery (+₹49)' },
+  { id: 'cod', name: 'Cash on Delivery', icon: <Truck style={{ width: 20, height: 20 }} />, details: 'Pay on delivery (+₹49)', codFee: 49 },
 ];
 
 type Address = {
@@ -52,6 +52,9 @@ export default function CheckoutPage() {
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
   const [promoDiscount, setPromoDiscount] = useState(0);
+  const [pincode, setPincode] = useState('');
+  const [pincodeStatus, setPincodeStatus] = useState<'idle' | 'checking' | 'available' | 'unavailable'>('idle');
+  const [deliveryEstimate, setDeliveryEstimate] = useState('');
 
   const subtotal = totalPrice();
   const shipping = subtotal >= 499 ? 0 : 49;
@@ -69,6 +72,24 @@ export default function CheckoutPage() {
         }
       })
       .catch(() => {});
+  }, []);
+
+  const checkPincode = useCallback((code: string) => {
+    setPincode(code);
+    if (code.length === 6) {
+      setPincodeStatus('checking');
+      setTimeout(() => {
+        const available = Math.random() > 0.2;
+        setPincodeStatus(available ? 'available' : 'unavailable');
+        if (available) {
+          const days = Math.floor(Math.random() * 3) + 1;
+          setDeliveryEstimate(`Delivery by ${new Date(Date.now() + days * 86400000).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}`);
+        }
+      }, 1000);
+    } else {
+      setPincodeStatus('idle');
+      setDeliveryEstimate('');
+    }
   }, []);
 
   const handlePlaceOrder = useCallback(async () => {
@@ -168,28 +189,67 @@ export default function CheckoutPage() {
       </motion.header>
 
       <main>
-        {/* Step Indicator */}
+        {/* Step Indicator - Flipkart Style */}
         <div style={{
-          display: 'flex', background: 'white', padding: '12px 16px',
+          display: 'flex', background: 'white', padding: '16px',
+          borderBottom: `1px solid ${mobileDesign.colors.borderLight}`,
+          position: 'relative',
+        }}>
+          {checkoutSteps.map((step, i) => {
+            const StepIcon = step.icon;
+            return (
+              <div key={step.id} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', position: 'relative' }}>
+                {/* Connector Line */}
+                {i < checkoutSteps.length - 1 && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '16px',
+                    left: '50%',
+                    width: '100%',
+                    height: '2px',
+                    background: i < currentStep ? mobileDesign.colors.accent : mobileDesign.colors.border,
+                    zIndex: 0,
+                  }} />
+                )}
+                <div style={{
+                  width: '32px', height: '32px', borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: i <= currentStep ? mobileDesign.colors.accent : mobileDesign.colors.borderLight,
+                  color: i <= currentStep ? 'white' : mobileDesign.colors.textTertiary,
+                  fontSize: '12px', fontWeight: 700,
+                  position: 'relative',
+                  zIndex: 1,
+                  border: i <= currentStep ? 'none' : `2px solid ${mobileDesign.colors.border}`,
+                }}>
+                  {i < currentStep ? <Check style={{ width: 16, height: 16 }} /> : <StepIcon style={{ width: 16, height: 16 }} />}
+                </div>
+                <span style={{
+                  fontSize: '11px', fontWeight: i === currentStep ? 700 : 500,
+                  color: i <= currentStep ? mobileDesign.colors.accent : mobileDesign.colors.textTertiary,
+                }}>
+                  {step.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Trust Badges - Flipkart Style */}
+        <div style={{
+          display: 'flex',
+          gap: '12px',
+          padding: '12px 16px',
+          background: mobileDesign.colors.accentLight,
           borderBottom: `1px solid ${mobileDesign.colors.borderLight}`,
         }}>
-          {checkoutSteps.map((step, i) => (
-            <div key={step.id} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-              <div style={{
-                width: '28px', height: '28px', borderRadius: '50%',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: i <= currentStep ? mobileDesign.colors.accent : mobileDesign.colors.border,
-                color: i <= currentStep ? 'white' : mobileDesign.colors.textTertiary,
-                fontSize: '12px', fontWeight: 700,
-              }}>
-                {i < currentStep ? <Check style={{ width: 16, height: 16 }} /> : i + 1}
-              </div>
-              <span style={{
-                fontSize: '11px', fontWeight: i === currentStep ? 700 : 500,
-                color: i <= currentStep ? mobileDesign.colors.accent : mobileDesign.colors.textTertiary,
-              }}>
-                {step.label}
-              </span>
+          {[
+            { icon: <Shield style={{ width: 14, height: 14 }} />, text: 'Secure Checkout' },
+            { icon: <Lock style={{ width: 14, height: 14 }} />, text: 'SSL Encrypted' },
+            { icon: <Truck style={{ width: 14, height: 14 }} />, text: 'Easy Returns' },
+          ].map((badge, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '4px', flex: 1, justifyContent: 'center' }}>
+              <span style={{ color: mobileDesign.colors.accent }}>{badge.icon}</span>
+              <span style={{ fontSize: '10px', fontWeight: 600, color: mobileDesign.colors.accent }}>{badge.text}</span>
             </div>
           ))}
         </div>
@@ -201,9 +261,60 @@ export default function CheckoutPage() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
           >
-            {/* Step 1: Address */}
+            {/* Step 1: Address - Flipkart Style */}
             {currentStep === 0 && (
               <div style={{ padding: `${mobileDesign.spacing.lg}px` }}>
+                {/* Pincode Checker - Flipkart Style */}
+                <div style={{
+                  padding: '12px',
+                  background: mobileDesign.colors.background,
+                  borderRadius: '12px',
+                  marginBottom: '16px',
+                }}>
+                  <h4 style={{ fontSize: '13px', fontWeight: 600, color: mobileDesign.colors.textSecondary, margin: '0 0 8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <MapPin style={{ width: 14, height: 14, color: mobileDesign.colors.accent }} />
+                    Check Delivery Availability
+                  </h4>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input
+                      type="text"
+                      value={pincode}
+                      onChange={(e) => checkPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="Enter pincode"
+                      style={{
+                        flex: 1, padding: '10px 12px',
+                        border: `1px solid ${mobileDesign.colors.border}`,
+                        borderRadius: '8px', background: 'white',
+                        fontSize: '14px', fontFamily: mobileDesign.typography.fontFamily,
+                        color: mobileDesign.colors.textPrimary, outline: 'none',
+                      }}
+                    />
+                    <HapticButton variant="primary" size="sm" disabled={pincode.length !== 6}>
+                      Check
+                    </HapticButton>
+                  </div>
+                  {pincodeStatus === 'checking' && (
+                    <p style={{ marginTop: '8px', fontSize: '12px', color: mobileDesign.colors.textTertiary, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Clock style={{ width: 12, height: 12 }} /> Checking availability...
+                    </p>
+                  )}
+                  {pincodeStatus === 'available' && (
+                    <div style={{ marginTop: '8px', padding: '8px 12px', background: mobileDesign.colors.successLight, borderRadius: '6px' }}>
+                      <p style={{ fontSize: '12px', fontWeight: 600, color: mobileDesign.colors.flipkartGreen, margin: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Check style={{ width: 12, height: 12 }} /> Delivery Available
+                      </p>
+                      {deliveryEstimate && (
+                        <p style={{ fontSize: '11px', color: mobileDesign.colors.textSecondary, margin: '2px 0 0' }}>{deliveryEstimate}</p>
+                      )}
+                    </div>
+                  )}
+                  {pincodeStatus === 'unavailable' && (
+                    <p style={{ marginTop: '8px', fontSize: '12px', color: mobileDesign.colors.error, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <X style={{ width: 12, height: 12 }} /> Delivery not available for this pincode
+                    </p>
+                  )}
+                </div>
+
                 <h3 style={{ fontSize: '14px', fontWeight: 700, color: mobileDesign.colors.textPrimary, margin: '0 0 12px' }}>
                   Select Delivery Address
                 </h3>
@@ -263,7 +374,7 @@ export default function CheckoutPage() {
               </div>
             )}
 
-            {/* Step 2: Payment */}
+            {/* Step 2: Payment - Flipkart Style */}
             {currentStep === 1 && (
               <div style={{ padding: `${mobileDesign.spacing.lg}px` }}>
                 <h3 style={{ fontSize: '14px', fontWeight: 700, color: mobileDesign.colors.textPrimary, margin: '0 0 12px' }}>
@@ -292,7 +403,14 @@ export default function CheckoutPage() {
                         {method.icon}
                       </div>
                       <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: '14px', fontWeight: 600, color: mobileDesign.colors.textPrimary }}>{method.name}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontSize: '14px', fontWeight: 600, color: mobileDesign.colors.textPrimary }}>{method.name}</span>
+                          {method.popular && (
+                            <span style={{ fontSize: '10px', fontWeight: 700, color: mobileDesign.colors.flipkartOrange, background: mobileDesign.colors.warningLight, padding: '2px 6px', borderRadius: '4px' }}>
+                              POPULAR
+                            </span>
+                          )}
+                        </div>
                         <p style={{ margin: '2px 0 0', fontSize: '12px', color: mobileDesign.colors.textTertiary }}>{method.details}</p>
                       </div>
                       <div style={{
@@ -306,6 +424,29 @@ export default function CheckoutPage() {
                     </motion.button>
                   ))}
                 </div>
+
+                {/* COD Warning - Flipkart Style */}
+                {selectedPayment === 'cod' && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    style={{
+                      marginTop: '12px',
+                      padding: '12px',
+                      background: mobileDesign.colors.warningLight,
+                      borderRadius: '8px',
+                      border: `1px solid ${mobileDesign.colors.warning}`,
+                    }}
+                  >
+                    <p style={{ fontSize: '12px', fontWeight: 600, color: mobileDesign.colors.warning, margin: '0 0 4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Info style={{ width: 14, height: 14 }} />
+                      Cash on Delivery
+                    </p>
+                    <p style={{ fontSize: '11px', color: mobileDesign.colors.textSecondary, margin: 0 }}>
+                      Additional ₹49 will be charged for COD orders. Pay via UPI/Card for free delivery.
+                    </p>
+                  </motion.div>
+                )}
               </div>
             )}
 

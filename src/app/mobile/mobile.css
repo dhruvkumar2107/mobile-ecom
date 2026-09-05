@@ -194,3 +194,261 @@ html:has(.mobile-root) body {
     scroll-behavior: auto !important;
   }
 }
+
+/* Flipkart-style shimmer animation for loading states */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Flipkart-style pulse animation for notifications */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Flipkart-style bounce animation for cart badge */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Flipkart-style slide up animation */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Flipkart-style fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Flipkart-style scale animation */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Flipkart-style shake animation for errors */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-4px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+/* Flipkart-style confetti animation for success */
+@keyframes confetti {
+  0% {
+    opacity: 0;
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100px) rotate(720deg);
+  }
+}
+
+/* Flipkart-style glow animation for buttons */
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(40, 116, 240, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(40, 116, 240, 0.8);
+  }
+}
+
+/* Flipkart-style ripple effect for buttons */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Flipkart-style progress bar animation */
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+/* Flipkart-style skeleton loading */
+.mobile-root .skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+/* Flipkart-style card hover effect */
+.mobile-root .card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mobile-root .card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Flipkart-style button press effect */
+.mobile-root .btn-press {
+  transition: transform 0.1s ease;
+}
+
+.mobile-root .btn-press:active {
+  transform: scale(0.95);
+}
+
+/* Flipkart-style input focus effect */
+.mobile-root .input-focus {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mobile-root .input-focus:focus {
+  border-color: #2874F0;
+  box-shadow: 0 0 0 3px rgba(40, 116, 240, 0.1);
+}
+
+/* Flipkart-style badge animation */
+.mobile-root .badge-animate {
+  animation: bounce 0.3s ease;
+}
+
+/* Flipkart-style notification dot */
+.mobile-root .notification-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background: #FF6161;
+  border-radius: 50%;
+  border: 2px solid white;
+  animation: pulse 2s infinite;
+}
+
+/* Flipkart-style loading overlay */
+.mobile-root .loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Flipkart-style success checkmark */
+.mobile-root .success-check {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #26A541;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: scaleIn 0.3s ease;
+}
+
+/* Flipkart-style error shake */
+.mobile-root .error-shake {
+  animation: shake 0.5s ease;
+}
+
+/* Flipkart-style toast notification */
+.mobile-root .toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 10000;
+  animation: slideUp 0.3s ease;
+}
+
+/* Flipkart-style pull to refresh indicator */
+.mobile-root .pull-refresh {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: spin 1s linear infinite;
+}
+
+/* Flipkart-style infinite scroll loader */
+.mobile-root .infinite-loader {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.mobile-root .infinite-loader::after {
+  content: '';
+  width: 30px;
+  height: 30px;
+  border: 3px solid #f0f0f0;
+  border-top-color: #2874F0;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}

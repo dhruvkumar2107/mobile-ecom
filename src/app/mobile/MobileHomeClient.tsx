@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, Bell, Heart, ShoppingCart, ChevronRight, X, SlidersHorizontal, Star } from 'lucide-react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { Search, MapPin, Bell, Heart, ShoppingCart, ChevronRight, X, SlidersHorizontal, Star, Clock, TrendingUp, Mic, ArrowUp, Flame, Zap, Shield, Truck, RotateCcw, Gift, ChevronDown, ChevronUp, Share2, ExternalLink, Info } from 'lucide-react';
 import { mobileDesign } from '@/lib/mobile-design';
 import { BottomTabNavigation } from '@/components/mobile/BottomTabNavigation';
 import { BannerCarousel } from '@/components/mobile/BannerCarousel';
@@ -15,6 +15,53 @@ import dynamic from 'next/dynamic';
 
 const SpinWheel = dynamic(() => import('@/components/mobile/SpinWheel').then(m => m.SpinWheel), { ssr: false });
 const VideoFeed = dynamic(() => import('@/components/mobile/VideoFeed').then(m => m.VideoFeed), { ssr: false });
+
+interface RecentlyViewed {
+  id: string;
+  name: string;
+  brand: string;
+  price: number;
+  originalPrice: number;
+  image: string;
+  slug: string;
+  viewedAt: number;
+}
+
+function getRecentlyViewed(): RecentlyViewed[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const data = localStorage.getItem('recently-viewed');
+    return data ? JSON.parse(data) : [];
+  } catch { return []; }
+}
+
+function addToRecentlyViewed(product: { id: string; name: string; brand: string; price: number; originalPrice: number; image: string; slug: string }) {
+  if (typeof window === 'undefined') return;
+  try {
+    const existing = getRecentlyViewed();
+    const filtered = existing.filter(p => p.id !== product.id);
+    const updated = [{ ...product, viewedAt: Date.now() }, ...filtered].slice(0, 20);
+    localStorage.setItem('recently-viewed', JSON.stringify(updated));
+  } catch {}
+}
+
+function getWishlist(): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const data = localStorage.getItem('mobile-wishlist');
+    return data ? JSON.parse(data) : [];
+  } catch { return []; }
+}
+
+function toggleWishlistItem(id: string): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const existing = getWishlist();
+    const updated = existing.includes(id) ? existing.filter(i => i !== id) : [...existing, id];
+    localStorage.setItem('mobile-wishlist', JSON.stringify(updated));
+    return updated;
+  } catch { return []; }
+}
 
 interface Product {
   id: string;
@@ -63,23 +110,61 @@ export default function MobileHomeClient({ initialProducts, initialBanners, init
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [showSpinWheel, setShowSpinWheel] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [recentlyViewed, setRecentlyViewed] = useState<RecentlyViewed[]>([]);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [activeFlashSaleTab, setActiveFlashSaleTab] = useState<'trending' | 'new' | 'best'>('trending');
+  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
   const totalItems = useCartStore((s) => s.totalItems);
+  const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     setCartCount(totalItems());
+    setRecentlyViewed(getRecentlyViewed());
+    const wishlistIds = getWishlist();
+    setWishlist(new Set(wishlistIds));
   }, [totalItems]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (searchQuery.length > 1) {
+      const suggestions = products
+        .filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase()))
+        .map(p => p.name)
+        .slice(0, 5);
+      setSearchSuggestions(suggestions);
+    } else {
+      setSearchSuggestions([]);
+    }
+  }, [searchQuery, products]);
+
   const handleWishlistToggle = useCallback((id: string) => {
-    setWishlist((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    const updated = toggleWishlistItem(id);
+    setWishlist(new Set(updated));
   }, []);
 
   const handleProductPress = useCallback((product: Product) => {
+    addToRecentlyViewed({
+      id: product.id,
+      name: product.name,
+      brand: product.brand || '',
+      price: product.price,
+      originalPrice: product.originalPrice || product.price,
+      image: product.image,
+      slug: product.slug || product.id,
+    });
     window.location.href = `/mobile/product/${product.slug || product.id}`;
+  }, []);
+
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   const filteredProducts = selectedCategory === 'all'
@@ -144,6 +229,26 @@ export default function MobileHomeClient({ initialProducts, initialBanners, init
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <motion.button
               whileTap={{ scale: 0.9 }}
+              onClick={() => setShowLocationPicker(true)}
+              style={{
+                width: '40px',
+                height: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: 'none',
+                borderRadius: '50%',
+                background: 'transparent',
+                color: 'white',
+                cursor: 'pointer',
+                position: 'relative',
+              }}
+              aria-label="Select delivery location"
+            >
+              <MapPin style={{ width: 22, height: 22 }} />
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.9 }}
               style={{
                 width: '40px',
                 height: '40px',
@@ -205,9 +310,29 @@ export default function MobileHomeClient({ initialProducts, initialBanners, init
             </motion.button>
           </div>
         </div>
+
+        {/* Location Strip */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            marginTop: '8px',
+            padding: '6px 0',
+          }}
+        >
+          <MapPin style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.8)' }} />
+          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>
+            Deliver to: <span style={{ fontWeight: 600, color: 'white' }}>Mumbai 400001</span>
+          </span>
+          <ChevronDown style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.6)' }} />
+        </motion.div>
       </motion.header>
 
-      {/* Search Overlay */}
+      {/* Search Overlay - Flipkart Style */}
       <AnimatePresence>
         {showSearch && (
           <motion.div
@@ -285,9 +410,55 @@ export default function MobileHomeClient({ initialProducts, initialBanners, init
                   )}
                 </div>
               </div>
-              <div style={{ padding: '12px 0 4px', display: 'flex', gap: '8px' }}>
-                <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>Trending:</span>
-                {['iPhone 15', 'Galaxy S24', 'OnePlus 12', 'boAt'].map((term) => (
+
+              {/* Search Suggestions - Flipkart Style */}
+              {searchSuggestions.length > 0 && (
+                <div style={{
+                  background: 'white',
+                  borderRadius: '0 0 12px 12px',
+                  marginTop: '8px',
+                  overflow: 'hidden',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                }}>
+                  {searchSuggestions.map((suggestion, index) => (
+                    <motion.button
+                      key={index}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      onClick={() => {
+                        setSearchQuery(suggestion);
+                        setShowSearch(false);
+                      }}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '12px 16px',
+                        border: 'none',
+                        borderBottom: index < searchSuggestions.length - 1 ? `1px solid ${mobileDesign.colors.borderLight}` : 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                    >
+                      <Clock style={{ width: 16, height: 16, color: mobileDesign.colors.textTertiary }} />
+                      <span style={{ fontSize: '14px', color: mobileDesign.colors.textPrimary, flex: 1 }}>
+                        {suggestion}
+                      </span>
+                      <ExternalLink style={{ width: 14, height: 14, color: mobileDesign.colors.textTertiary }} />
+                    </motion.button>
+                  ))}
+                </div>
+              )}
+
+              {/* Trending Searches - Flipkart Style */}
+              <div style={{ padding: '12px 0 4px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Flame style={{ width: 14, height: 14 }} /> Trending:
+                </span>
+                {['iPhone 15', 'Galaxy S24', 'OnePlus 12', 'boAt', 'MacBook Air'].map((term) => (
                   <button
                     key={term}
                     onClick={() => { setSearchQuery(term); setShowSearch(false); }}
@@ -704,6 +875,202 @@ export default function MobileHomeClient({ initialProducts, initialBanners, init
         >
           <VideoFeed />
         </motion.section>
+
+        {/* Recently Viewed - Flipkart Style */}
+        {recentlyViewed.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.55 }}
+            style={{
+              padding: `${mobileDesign.spacing.md}px ${mobileDesign.spacing.lg}px`,
+              background: 'white',
+              margin: `${mobileDesign.spacing.sm}px`,
+              borderRadius: '12px',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <h2 style={{
+                fontSize: '18px',
+                fontWeight: 700,
+                color: mobileDesign.colors.textPrimary,
+                margin: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}>
+                <Clock style={{ width: 18, height: 18, color: mobileDesign.colors.accent }} />
+                Recently Viewed
+              </h2>
+              <button
+                onClick={() => setRecentlyViewed([])}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  color: mobileDesign.colors.accent,
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Clear All
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '8px', scrollbarWidth: 'none' }}>
+              {recentlyViewed.slice(0, 8).map((item, index) => (
+                <motion.a
+                  key={item.id}
+                  href={`/mobile/product/${item.slug}`}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  style={{
+                    minWidth: '120px',
+                    maxWidth: '120px',
+                    background: mobileDesign.colors.surface,
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    textDecoration: 'none',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                    border: `1px solid ${mobileDesign.colors.borderLight}`,
+                  }}
+                >
+                  <div style={{
+                    position: 'relative',
+                    width: '100%',
+                    aspectRatio: '1/1',
+                    background: '#F8F8F8',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '8px',
+                  }}>
+                    <img
+                      src={item.image || '/icon.svg'}
+                      alt={item.name}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                      }}
+                    />
+                  </div>
+                  <div style={{ padding: '6px 8px 8px' }}>
+                    <p style={{
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color: mobileDesign.colors.textPrimary,
+                      margin: '0 0 2px',
+                      lineHeight: 1.2,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}>
+                      {item.name}
+                    </p>
+                    <p style={{
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      color: mobileDesign.colors.textPrimary,
+                      margin: 0,
+                    }}>
+                      {formatINR(item.price)}
+                    </p>
+                  </div>
+                </motion.a>
+              ))}
+            </div>
+          </motion.section>
+        )}
+
+        {/* Trust Badges - Flipkart Style */}
+        <motion.section
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '8px',
+            padding: `${mobileDesign.spacing.sm}px`,
+          }}
+        >
+          {[
+            { icon: <Truck style={{ width: 24, height: 24 }} />, title: 'Free Delivery', subtitle: 'On orders above ₹499' },
+            { icon: <Shield style={{ width: 24, height: 24 }} />, title: 'Genuine Products', subtitle: '100% authentic' },
+            { icon: <RotateCcw style={{ width: 24, height: 24 }} />, title: 'Easy Returns', subtitle: '7-day return policy' },
+          ].map((badge, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.65 + index * 0.05 }}
+              style={{
+                background: 'white',
+                borderRadius: '10px',
+                padding: '12px 8px',
+                textAlign: 'center',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+              }}
+            >
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                background: mobileDesign.colors.accentLight,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 8px',
+                color: mobileDesign.colors.accent,
+              }}>
+                {badge.icon}
+              </div>
+              <p style={{ fontSize: '11px', fontWeight: 700, color: mobileDesign.colors.textPrimary, margin: '0 0 2px' }}>
+                {badge.title}
+              </p>
+              <p style={{ fontSize: '10px', color: mobileDesign.colors.textTertiary, margin: 0 }}>
+                {badge.subtitle}
+              </p>
+            </motion.div>
+          ))}
+        </motion.section>
+
+        {/* Back to Top Button - Flipkart Style */}
+        <AnimatePresence>
+          {showBackToTop && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={scrollToTop}
+              style={{
+                position: 'fixed',
+                bottom: `${mobileDesign.touchTarget + mobileDesign.spacing['2xl']}px`,
+                right: '16px',
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                background: mobileDesign.colors.accent,
+                color: 'white',
+                border: 'none',
+                boxShadow: '0 4px 12px rgba(40, 116, 240, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                zIndex: mobileDesign.zIndex.dropdown,
+              }}
+              aria-label="Scroll to top"
+            >
+              <ArrowUp style={{ width: 24, height: 24 }} />
+            </motion.button>
+          )}
+        </AnimatePresence>
       </main>
 
       <BottomTabNavigation currentTab="home" cartCount={cartCount} />

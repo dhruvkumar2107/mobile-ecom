@@ -2,13 +2,48 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2, ChevronLeft, ChevronDown, Check, Minus, Plus, Shield, Truck, RotateCcw, Tag } from 'lucide-react';
+import { Trash2, ChevronLeft, ChevronDown, Check, Minus, Plus, Shield, Truck, RotateCcw, Tag, Bookmark, Share2, Heart, ShoppingCart, ArrowRight, Zap, Info, Clock, MapPin } from 'lucide-react';
 import { mobileDesign } from '@/lib/mobile-design';
 import { MobileImage } from '@/components/mobile/MobileImage';
 import { BottomTabNavigation } from '@/components/mobile/BottomTabNavigation';
 import { HapticButton } from '@/components/mobile/HapticButton';
 import { formatINR } from '@/lib/money';
 import { useCartStore } from '@/stores/cart';
+
+interface SavedForLaterItem {
+  id: string;
+  name: string;
+  brand: string;
+  price: number;
+  originalPrice: number;
+  image: string;
+  quantity: number;
+}
+
+function getSavedForLater(): SavedForLaterItem[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const data = localStorage.getItem('saved-for-later');
+    return data ? JSON.parse(data) : [];
+  } catch { return []; }
+}
+
+function saveForLater(item: SavedForLaterItem) {
+  if (typeof window === 'undefined') return;
+  try {
+    const existing = getSavedForLater();
+    const filtered = existing.filter(i => i.id !== item.id);
+    localStorage.setItem('saved-for-later', JSON.stringify([item, ...filtered]));
+  } catch {}
+}
+
+function removeFromSavedForLater(id: string) {
+  if (typeof window === 'undefined') return;
+  try {
+    const existing = getSavedForLater();
+    localStorage.setItem('saved-for-later', JSON.stringify(existing.filter(i => i.id !== id)));
+  } catch {}
+}
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, clearCart } = useCartStore();
@@ -19,11 +54,45 @@ export default function CartPage() {
   const [promoError, setPromoError] = useState('');
   const [promoSuccess, setPromoSuccess] = useState('');
   const [isApplying, setIsApplying] = useState(false);
+  const [savedItems, setSavedItems] = useState<SavedForLaterItem[]>([]);
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState<string | null>(null);
+  const [deliveryPincode, setDeliveryPincode] = useState('400001');
+  const [showPincodeInput, setShowPincodeInput] = useState(false);
+
+  useEffect(() => {
+    setSavedItems(getSavedForLater());
+  }, []);
 
   const subtotal = totalPrice();
   const itemCount = totalItems();
   const shipping = subtotal >= 499 ? 0 : 49;
   const total = subtotal + shipping;
+
+  const handleSaveForLater = useCallback((item: any) => {
+    saveForLater({
+      id: item.id,
+      name: item.name,
+      brand: item.brand || '',
+      price: item.price,
+      originalPrice: item.originalPrice || item.price,
+      image: item.image || '/icon.svg',
+      quantity: item.quantity,
+    });
+    removeItem(item.id);
+    setSavedItems(getSavedForLater());
+  }, [removeItem]);
+
+  const handleMoveToCart = useCallback((item: SavedForLaterItem) => {
+    useCartStore.getState().addItem({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      image: item.image,
+      brand: item.brand,
+    });
+    removeFromSavedForLater(item.id);
+    setSavedItems(getSavedForLater());
+  }, []);
 
   const applyPromo = useCallback(async () => {
     if (!promoCode.trim()) return;
@@ -137,7 +206,7 @@ export default function CartPage() {
       </motion.header>
 
       <main style={{ paddingTop: `${mobileDesign.spacing.sm}px` }}>
-        {/* Delivery Info */}
+        {/* Delivery Info - Flipkart Style */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -145,15 +214,72 @@ export default function CartPage() {
             display: 'flex', alignItems: 'center', gap: '8px',
             padding: `${mobileDesign.spacing.md}px ${mobileDesign.spacing.lg}px`,
             background: 'white', marginBottom: `${mobileDesign.spacing.sm}px`,
+            borderBottom: `1px solid ${mobileDesign.colors.borderLight}`,
           }}
         >
-          <Truck style={{ width: 18, height: 18, color: mobileDesign.colors.flipkartGreen }} />
-          <span style={{ fontSize: '13px', color: mobileDesign.colors.textSecondary }}>
-            Delivery to: <span style={{ fontWeight: 600, color: mobileDesign.colors.textPrimary }}>Mumbai 400001</span>
-          </span>
+          <MapPin style={{ width: 18, height: 18, color: mobileDesign.colors.accent, flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <span style={{ fontSize: '12px', color: mobileDesign.colors.textTertiary }}>Deliver to:</span>
+            <span style={{ fontSize: '13px', fontWeight: 600, color: mobileDesign.colors.textPrimary, marginLeft: '4px' }}>
+              Mumbai 400001
+            </span>
+          </div>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowPincodeInput(!showPincodeInput)}
+            style={{
+              padding: '6px 12px',
+              background: mobileDesign.colors.accentLight,
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '12px',
+              fontWeight: 600,
+              color: mobileDesign.colors.accent,
+              cursor: 'pointer',
+            }}
+          >
+            Change
+          </motion.button>
         </motion.div>
 
-        {/* Cart Items */}
+        {/* Free Delivery Progress - Flipkart Style */}
+        {subtotal < 499 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              padding: `${mobileDesign.spacing.md}px ${mobileDesign.spacing.lg}px`,
+              background: 'white',
+              marginBottom: `${mobileDesign.spacing.sm}px`,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <Truck style={{ width: 16, height: 16, color: mobileDesign.colors.flipkartGreen }} />
+              <span style={{ fontSize: '13px', color: mobileDesign.colors.textSecondary }}>
+                Add <span style={{ fontWeight: 700, color: mobileDesign.colors.flipkartGreen }}>{formatINR(499 - subtotal)}</span> more for FREE delivery
+              </span>
+            </div>
+            <div style={{
+              height: '6px',
+              background: mobileDesign.colors.border,
+              borderRadius: '3px',
+              overflow: 'hidden',
+            }}>
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${Math.min((subtotal / 499) * 100, 100)}%` }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                style={{
+                  height: '100%',
+                  background: 'linear-gradient(90deg, #26A541, #2ECC71)',
+                  borderRadius: '3px',
+                }}
+              />
+            </div>
+          </motion.div>
+        )}
+
+        {/* Cart Items - Flipkart Style */}
         <AnimatePresence mode="popLayout">
           {items.map((item, index) => (
             <motion.div
@@ -167,6 +293,7 @@ export default function CartPage() {
                 background: 'white',
                 padding: `${mobileDesign.spacing.lg}px`,
                 marginBottom: `${mobileDesign.spacing.sm}px`,
+                borderBottom: `1px solid ${mobileDesign.colors.borderLight}`,
               }}
             >
               <div style={{ display: 'flex', gap: '12px' }}>
@@ -193,9 +320,15 @@ export default function CartPage() {
                     {item.name}
                   </h4>
 
-                  {/* Quantity Controls */}
+                  {/* Quantity Controls - Flipkart Style */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: 'auto' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', border: `1px solid ${mobileDesign.colors.border}`, borderRadius: '8px' }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      border: `1px solid ${mobileDesign.colors.border}`, 
+                      borderRadius: '8px',
+                      background: mobileDesign.colors.background,
+                    }}>
                       <motion.button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         whileTap={{ scale: 0.9 }}
@@ -227,23 +360,39 @@ export default function CartPage() {
                       </motion.button>
                     </div>
 
+                    {/* Save for Later - Flipkart Style */}
                     <motion.button
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => handleSaveForLater(item)}
+                      whileTap={{ scale: 0.9 }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '4px',
+                        padding: '6px 12px', border: 'none', borderRadius: '8px',
+                        background: mobileDesign.colors.accentLight, color: mobileDesign.colors.accent,
+                        fontSize: '12px', fontWeight: 600, cursor: 'pointer',
+                      }}
+                    >
+                      <Bookmark style={{ width: 14, height: 14 }} />
+                      Save for later
+                    </motion.button>
+
+                    {/* Remove - Flipkart Style */}
+                    <motion.button
+                      onClick={() => setShowRemoveConfirm(item.id)}
                       whileTap={{ scale: 0.9 }}
                       style={{
                         display: 'flex', alignItems: 'center', gap: '4px',
                         padding: '6px 12px', border: 'none', borderRadius: '8px',
                         background: 'transparent', color: mobileDesign.colors.textTertiary,
-                        fontSize: '13px', fontWeight: 500, cursor: 'pointer',
+                        fontSize: '12px', fontWeight: 500, cursor: 'pointer',
                       }}
                     >
-                      <Trash2 style={{ width: 16, height: 16 }} />
+                      <Trash2 style={{ width: 14, height: 14 }} />
                       Remove
                     </motion.button>
                   </div>
                 </div>
 
-                {/* Price */}
+                {/* Price - Flipkart Style */}
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
                   <p style={{ fontSize: '16px', fontWeight: 700, color: mobileDesign.colors.textPrimary, margin: 0 }}>
                     {formatINR(item.price * item.quantity)}
@@ -259,7 +408,50 @@ export default function CartPage() {
           ))}
         </AnimatePresence>
 
-        {/* Promo Code */}
+        {/* Saved for Later - Flipkart Style */}
+        {savedItems.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              background: 'white',
+              marginTop: `${mobileDesign.spacing.sm}px`,
+              padding: `${mobileDesign.spacing.lg}px`,
+            }}
+          >
+            <h3 style={{ fontSize: '14px', fontWeight: 700, color: mobileDesign.colors.textPrimary, margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Bookmark style={{ width: 18, height: 18, color: mobileDesign.colors.accent }} />
+              Saved for Later ({savedItems.length})
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {savedItems.map((item) => (
+                <div key={item.id} style={{ display: 'flex', gap: '12px', padding: '12px', background: mobileDesign.colors.background, borderRadius: '8px' }}>
+                  <div style={{ width: '60px', height: '60px', borderRadius: '6px', background: 'white', flexShrink: 0, overflow: 'hidden' }}>
+                    <MobileImage src={item.image} alt="" sizes="60px" />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: mobileDesign.colors.textPrimary }}>{item.name}</p>
+                    <p style={{ margin: '2px 0 0', fontSize: '14px', fontWeight: 700, color: mobileDesign.colors.textPrimary }}>{formatINR(item.price)}</p>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <HapticButton variant="primary" size="sm" onClick={() => handleMoveToCart(item)} style={{ minWidth: 'auto', fontSize: '12px' }}>
+                      Move to Cart
+                    </HapticButton>
+                    <motion.button
+                      onClick={() => { removeFromSavedForLater(item.id); setSavedItems(getSavedForLater()); }}
+                      whileTap={{ scale: 0.9 }}
+                      style={{ padding: '4px 8px', border: 'none', background: 'transparent', color: mobileDesign.colors.error, fontSize: '12px', fontWeight: 500, cursor: 'pointer' }}
+                    >
+                      Remove
+                    </motion.button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.section>
+        )}
+
+        {/* Promo Code - Flipkart Style */}
         <motion.section
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -310,9 +502,37 @@ export default function CartPage() {
           </div>
           {promoError && <p style={{ marginTop: '8px', fontSize: '13px', color: mobileDesign.colors.error }}>{promoError}</p>}
           {promoSuccess && <p style={{ marginTop: '8px', fontSize: '13px', color: mobileDesign.colors.flipkartGreen }}>{promoSuccess}</p>}
+          
+          {/* Available Coupons - Flipkart Style */}
+          <div style={{ marginTop: '12px', padding: '12px', background: mobileDesign.colors.successLight, borderRadius: '8px' }}>
+            <p style={{ fontSize: '12px', fontWeight: 600, color: mobileDesign.colors.flipkartGreen, margin: '0 0 4px' }}>
+              Available Coupons
+            </p>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {['FIRST10', 'SAVE20', 'WELCOME50'].map(coupon => (
+                <motion.button
+                  key={coupon}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => { setPromoCode(coupon); }}
+                  style={{
+                    padding: '4px 10px',
+                    border: `1px dashed ${mobileDesign.colors.flipkartGreen}`,
+                    borderRadius: '6px',
+                    background: 'white',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: mobileDesign.colors.flipkartGreen,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {coupon}
+                </motion.button>
+              ))}
+            </div>
+          </div>
         </motion.section>
 
-        {/* Price Details */}
+        {/* Price Details - Flipkart Style */}
         <motion.section
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -323,7 +543,8 @@ export default function CartPage() {
             marginTop: `${mobileDesign.spacing.sm}px`,
           }}
         >
-          <h3 style={{ fontSize: '14px', fontWeight: 700, color: mobileDesign.colors.textPrimary, margin: '0 0 12px' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: 700, color: mobileDesign.colors.textPrimary, margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Info style={{ width: 18, height: 18, color: mobileDesign.colors.accent }} />
             Price Details
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -353,14 +574,15 @@ export default function CartPage() {
               </div>
             </div>
             {shipping === 0 && (
-              <p style={{ fontSize: '13px', color: mobileDesign.colors.flipkartGreen, fontWeight: 600, margin: '4px 0 0' }}>
+              <p style={{ fontSize: '13px', color: mobileDesign.colors.flipkartGreen, fontWeight: 600, margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Zap style={{ width: 14, height: 14 }} />
                 You will save {formatINR(49)} on this order
               </p>
             )}
           </div>
         </motion.section>
 
-        {/* Safe & Secure */}
+        {/* Safe & Secure - Flipkart Style */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -378,7 +600,7 @@ export default function CartPage() {
         </motion.div>
       </main>
 
-      {/* Bottom Checkout Bar */}
+      {/* Bottom Checkout Bar - Flipkart Style */}
       <motion.div
         initial={{ y: 80 }}
         animate={{ y: 0 }}
@@ -389,29 +611,39 @@ export default function CartPage() {
           boxShadow: '0 -4px 12px rgba(0,0,0,0.08)',
           padding: `${mobileDesign.spacing.md}px ${mobileDesign.spacing.lg}px`,
           paddingBottom: `calc(${mobileDesign.spacing.md}px + env(safe-area-inset-bottom, 0px))`,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}
       >
-        <div>
-          <p style={{ fontSize: '18px', fontWeight: 700, color: mobileDesign.colors.textPrimary, margin: 0 }}>
-            {formatINR(total)}
-          </p>
-          <p style={{ fontSize: '12px', color: mobileDesign.colors.flipkartGreen, margin: '2px 0 0', fontWeight: 600 }}>
-            {shipping === 0 ? 'FREE Delivery' : ''}
-          </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+          <div>
+            <p style={{ fontSize: '18px', fontWeight: 700, color: mobileDesign.colors.textPrimary, margin: 0 }}>
+              {formatINR(total)}
+            </p>
+            <p style={{ fontSize: '12px', color: mobileDesign.colors.flipkartGreen, margin: '2px 0 0', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {shipping === 0 ? (
+                <>
+                  <Truck style={{ width: 12, height: 12 }} />
+                  FREE Delivery
+                </>
+              ) : (
+                `+ ${formatINR(shipping)} delivery`
+              )}
+            </p>
+          </div>
+          <HapticButton
+            variant="primary"
+            size="xl"
+            onClick={() => window.location.href = '/mobile/checkout'}
+            style={{
+              background: 'linear-gradient(135deg, #2874F0 0%, #1E5FC0 100%)',
+              fontWeight: 700,
+              minWidth: '160px',
+              boxShadow: '0 4px 12px rgba(40, 116, 240, 0.4)',
+            }}
+          >
+            <Zap style={{ width: 18, height: 18, marginRight: '6px' }} />
+            Place Order
+          </HapticButton>
         </div>
-        <HapticButton
-          variant="primary"
-          size="xl"
-          onClick={() => window.location.href = '/mobile/checkout'}
-          style={{
-            background: mobileDesign.colors.accent,
-            fontWeight: 700,
-            minWidth: '160px',
-          }}
-        >
-          Place Order
-        </HapticButton>
       </motion.div>
 
       <BottomTabNavigation currentTab="cart" cartCount={itemCount} />
