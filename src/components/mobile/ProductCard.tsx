@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Heart, Star, ShoppingCart, Share2, Eye } from 'lucide-react';
+import { Heart, Star, ShoppingCart, Share2, Eye, Zap } from 'lucide-react';
 import { mobileDesign } from '@/lib/mobile-design';
 import { formatINR } from '@/lib/money';
 
