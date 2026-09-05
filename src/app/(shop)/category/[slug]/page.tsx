@@ -3,6 +3,16 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { db } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
+
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const categories = await db.category.findMany({
+    where: { isActive: true, parentId: null },
+    select: { slug: true },
+  });
+  return categories.map((c) => ({ slug: c.slug }));
+}
 import { listProducts, type ProductFilter, type ListResult } from '@/lib/services/catalog';
 import { CATALOG_SORTS, CATALOG_SORT_LABEL } from '@/lib/services/catalog';
 import { ProductListingClient } from '@/app/(shop)/products/ProductListingClient';

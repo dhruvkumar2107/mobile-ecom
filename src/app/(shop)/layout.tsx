@@ -1,10 +1,15 @@
 import { redirect } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { getSettings } from '@/lib/services/settings';
 import { SiteHeader } from '@/components/site/header';
 import { SiteFooter } from '@/components/site/footer';
-import { PageTransition } from '@/components/ui/page-transition';
+
+const PageTransition = dynamic(
+  () => import('@/components/ui/page-transition').then((m) => m.PageTransition),
+  { ssr: false },
+);
 
 /**
  * The `(shop)` route group wraps every storefront page. It resolves the

@@ -2,7 +2,18 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth';
 import { getProductBySlug, type ProductDetail } from '@/lib/services/catalog';
+import { db } from '@/lib/db';
 import { ProductDetailClient } from './ProductDetailClient';
+
+export const revalidate = 120;
+
+export async function generateStaticParams() {
+  const products = await db.product.findMany({
+    where: { status: 'active' },
+    select: { slug: true },
+  });
+  return products.map((p) => ({ slug: p.slug }));
+}
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;

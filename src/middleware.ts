@@ -72,7 +72,7 @@ export function middleware(request: NextRequest) {
     if (match) {
       const url = request.nextUrl.clone();
       url.pathname = route.to(match);
-      return NextResponse.redirect(url);
+      return NextResponse.rewrite(url);
     }
   }
 
